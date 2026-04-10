@@ -1,0 +1,11 @@
+
+services:
+  mrpv1:
+    image: mrpv1
+    build:
+      context: .
+      dockerfile: mrpv1/Dockerfile
+      args:
+        - configuration=Debug
+    volumes:
+      - ~/.vsdbg:/remote_debugger:rw
