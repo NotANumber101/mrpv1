@@ -12,25 +12,10 @@ namespace mrpv1.Pages;
 public class DesignPage() : Page
 
 {
-        PartController partController = new();
-
-
-enum PageTitle
-{
-    DesignPage,
-    ManufacturePage,
-    PartPage
-};
-
-    //TODO CASE ANALYSIS
-    // all cases
-    // op has pc and pp
-    // op has pc and mp
-    // etc
     public async Task Display()
     {
         Console.WriteLine("DESIGN PAGE");
-        var designPageOptions = new List<string> { "manage catalog"};
+        var designPageOptions = new List<string> { "manage catalog" };
         var designPageChoice = AnsiConsole.Prompt(
             new SelectionPrompt<string>()
                 .Title("[green]Select a page to view:[/]")
@@ -82,15 +67,17 @@ enum PageTitle
     public async Task CreateOperation()
     {
         // todo, a function thats seeds the db with my locations enums
-
+        if (AnsiConsole.Confirm("Display PARTS?"))
+        {
+            await new PartPage().DisplayPartTable();
+        }
 
         int partProduced = AnsiConsole.Ask<int>($"[green]Inventory Part Produced: [/]");
+        // auto create part, set location to wc
         int partConsumed = AnsiConsole.Ask<int>($"[green]Inventory Part Consumed: [/]");
         int mPartProduced = AnsiConsole.Ask<int>($"[green]Manufacture Part Produced: [/]");
         int mPartConsumed = AnsiConsole.Ask<int>($"[green]Manufacture Part Consumed: [/]");
         string operationInstruction = AnsiConsole.Ask<string>($"[green]op instructions: [/]");
-
-
 
         /// INSERT OPERATION
         Operation newOp = new()
@@ -105,12 +92,11 @@ enum PageTitle
         if (AnsiConsole.Confirm("Create more operations?"))
         {
             await CreateOperation();
-        } else
+        }
+        else
         {
             await new DesignPage().Display();
         }
-
-
     }
     public async Task CreateMockOperations()
     {

@@ -1,5 +1,4 @@
 using System;
-using Npgsql;
 using Spectre.Console;
 
 namespace mrpv1.Pages;
@@ -27,6 +26,7 @@ public class Page()
     }
     private async Task Redirect(PageTitle pageTitle)
     {
+        await ClearDisplay();
         switch (pageTitle)
         {
             case PageTitle.DesignPage:

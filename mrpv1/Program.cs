@@ -28,11 +28,11 @@ if (AnsiConsole.Profile.Capabilities.Interactive)
         .SpinnerStyle(Style.Parse("green"))
         .Start("Welcome!", async ctx =>
         {
-            Thread.Sleep(550);
+            Thread.Sleep(300);
             ctx.Status("Loading configuration...");
-            Thread.Sleep(700);
+            Thread.Sleep(300);
             ctx.Status("Starting services...");
-            Thread.Sleep(700);
+            Thread.Sleep(300);
         });
     AnsiConsole.MarkupLine("LOG: Interactive mode detected.[green]Input Mode Enabled.[/]");
     await new Page().MainMenu();

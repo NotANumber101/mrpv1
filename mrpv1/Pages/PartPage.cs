@@ -12,21 +12,32 @@ namespace mrpv1.Pages;
 public class PartPage() : Page
 
 {
-    PartController partController = new();
+    readonly PartController partController = new();
     public async Task Display()
     {
+        await DisplayPartTable();
         await CreatePart();
     }
-    public async Task CreatePart()
+    public async Task DisplayPartTable()
     {
+        var myTable = new Table()
+            .RoundedBorder()
+            .BorderColor(Color.Grey);
+        myTable.AddColumn("Id");
+        myTable.AddColumn("InventoryId");
+        myTable.AddColumn("Name");
+        myTable.AddColumn("Quantity");
+
         var parts = await partController.GetParts();
         foreach (Part part in parts)
         {
-            Console.WriteLine($"PartId: {part.Id}, PartName: {part.Name}");
-            Console.WriteLine($"InventoryId: {part.InventoryId}, Quantity: {part.Quantity}");
+            myTable.AddRow(part.Id.ToString(), part.InventoryId.ToString(), part.Name, part.Quantity.ToString());
         }
+        AnsiConsole.Write(myTable);
+    }
+    public async Task CreatePart()
+    {
         string partName = AnsiConsole.Ask<string>($"[green]partname:[/]");
-        Console.WriteLine("Select Inventory location for the new part");
         var partInventoryOptions = new List<Locations.InventoryLocations>
                 {
                     Locations.InventoryLocations.CabinetA,
@@ -37,7 +48,7 @@ public class PartPage() : Page
                 };
         var partInventoryLocation = AnsiConsole.Prompt(
             new SelectionPrompt<Locations.InventoryLocations>()
-                .Title("[green]Select a page to view:[/]")
+                .Title("[green]Select inventory location for the new part[/]")
                 .PageSize(10)
                 .AddChoices(partInventoryOptions));
 
@@ -58,7 +69,7 @@ public class PartPage() : Page
         }
         else
         {
-            await new PartPage().Display();
+            await MainMenu();
         }
     }
 }

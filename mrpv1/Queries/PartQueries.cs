@@ -1,7 +1,5 @@
 using mrpv1.Models;
-
 namespace mrpv1.Queries;
-
 public class PartQueries
 
 {
