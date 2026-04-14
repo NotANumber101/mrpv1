@@ -1,6 +1,11 @@
-https://www.geaerospace.com
+Why does the system exist?
+Why should we make it?
 
-https://www.teledynevisionsolutions.com/solutions/defense/
 
-https://eme-es.com/en/sentinel/
+Who owns a work order, whos responsibiblity? Who decides? What is the thought process wbehind the decision.
+    Is the answer: Logistics? (the buisness layer logic)
+
+
+
+
 

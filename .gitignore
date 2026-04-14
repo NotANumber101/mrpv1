@@ -1,4 +1,4 @@
 /mrpv1/bin
 /mrpv1/obj
 
-mrpv1/postgres/init-scripts/01_init.sql
+mrpv1/postgres/init-scripts/
