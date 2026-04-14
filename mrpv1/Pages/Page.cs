@@ -18,8 +18,7 @@ public class Page()
     }
     public async Task MainMenu()
     {
-        await ClearDisplay();
-        var pageOptions = new List<string> { "fallback" };
+        var pageOptions = new List<string> { "design", "manufacture", "inventory" };
         var pageChoice = AnsiConsole.Prompt(
             new SelectionPrompt<string>()
                 .Title("[green]Select a page to view:[/]")
@@ -28,11 +27,20 @@ public class Page()
         await PageRedirect(pageChoice);
     }
 
-    private async Task PageRedirect(string pageChoice)
+    public async Task PageRedirect(string pageChoice)
     {
-        if (pageChoice == "fallback")
+        if (pageChoice == "design")
         {
-            await new FallbackPage().Display();
+            await new DesignPage().Display();
+
+        }
+        else if (pageChoice == "inventory")
+        {
+            await new PartPage().Display();
+        }
+        else if (pageChoice == "manufacture")
+        {
+            await new ManufacturePage().Display();
         }
         else
         {

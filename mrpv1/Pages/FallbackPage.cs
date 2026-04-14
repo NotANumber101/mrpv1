@@ -16,15 +16,7 @@ public class FallbackPage() : Page
         DbMetaController dbMetaController = new DbMetaController();
         List<string> dbTableNames = await dbMetaController.GetDbTableNames();
         List<string> dbFieldNames = await dbMetaController.GetTableFieldNames();
-        // if (dbTableNames.Any())
-        // {
-        //     int count = 1;
-        //     foreach(string tableName in dbTableNames)
-        //     {
-        //         Console.WriteLine($"{count}. {tableName}");
-        //         count++;
-        //     }
-        // }
+
         Console.WriteLine("Interactive Mode is disabled.");
         Console.WriteLine("Nothing left to do.");
         Console.WriteLine("Exiting...");

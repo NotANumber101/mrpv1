@@ -9,9 +9,9 @@ public class PartQueries
     {
         return "SELECT * FROM part;";
     }
-        public static string CreatePart()
+        public static string CreatePart(Part newPart)
     {
-        return "INSERT into part (name) "
-            + "VALUES ('TESTNAMEPART');";
+        return "INSERT into part (inventoryId, name, quantity) "
+            + $"VALUES ({newPart.InventoryId}, '{newPart.Name}', {newPart.Quantity});";
     }
 }

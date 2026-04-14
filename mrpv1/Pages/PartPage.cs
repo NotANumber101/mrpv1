@@ -15,14 +15,65 @@ public class PartPage() : Page
     PartController partController = new();
     public async Task Display()
     {
-        Console.WriteLine("part page");
-        await partController.CreatePart();
-        var res = await partController.GetParts();
-        foreach (Part part in res)
+        await CreatePart();
+    }
+    public async Task CreatePart()
+    {
+        // todo, a function thats seeds the db with my locations enums
+        var parts = await partController.GetParts();
+        foreach(Part part in parts)
         {
-            Console.WriteLine(part.Id.ToString());
-            Console.WriteLine(part.Name);
-            Console.WriteLine("");
+
+
+
+
+            Console.WriteLine($"PartId: {part.Id}, PartName: {part.Name}");
+            Console.WriteLine($"InventoryId: {part.InventoryId}, Quantity: {part.Quantity}");
+            
+        }
+
+        string partName = AnsiConsole.Ask<string>($"[green]partname:[/]");
+            Console.WriteLine("Select Inventory location for the new part");
+                // var pageOptions = new List<string> { "design", "manufacture" };
+                var partInventoryOptions= new List<Locations.InventoryLocations>
+                {
+                    Locations.InventoryLocations.CabinetA,
+                    Locations.InventoryLocations.ClosetA,
+                    Locations.InventoryLocations.Fridge,
+                    Locations.InventoryLocations.Garage,
+                    Locations.InventoryLocations.Kitchen
+                };
+
+
+        var partInventoryLocation = AnsiConsole.Prompt(
+            new SelectionPrompt<Locations.InventoryLocations>()
+                .Title("[green]Select a page to view:[/]")
+                .PageSize(10)
+                .AddChoices(partInventoryOptions));
+
+        int locationId = (int) partInventoryLocation;
+
+
+
+        /// INSERT OPERATION
+        Part newPart = new()
+        {
+            InventoryId = locationId,
+            Name = partName,
+            Quantity = 0
+        };
+
+
+        await partController.CreatePart(newPart);
+
+
+
+        if (AnsiConsole.Confirm("Create more Parts?"))
+        {
+            await CreatePart();
+        } else
+        {
+            await new PartPage().Display();
         }
     }
 }

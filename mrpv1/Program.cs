@@ -35,59 +35,10 @@ if (AnsiConsole.Profile.Capabilities.Interactive)
             Thread.Sleep(700);
         });
     AnsiConsole.MarkupLine("LOG: Interactive mode detected.[green]Input Mode Enabled.[/]");
-    // WorkCenterPage wcPage = new();
-    // await wcPage.Display();
-
-    await new PartPage().Display();
+    await new Page().MainMenu();
 }
 else
 {
     AnsiConsole.MarkupLine("[red]LOG: Interactive Mode Disabled... Input Mode Disabled.[/]");
-    // FallbackPage fallbackPage = new();
     await new FallbackPage().Display();
 }
-
-
-
-// var choice = AnsiConsole.Prompt(
-//     new SelectionPrompt<string>()
-//         .Title("[green]What would you like to do?[/]")
-//         .AddChoices("Design", "Manufacture"));
-
-// AnsiConsole.MarkupLine($"Page: [blue]{choice}[/]");
-
-// if (choice == "Design")
-// {
-// AnsiConsole.MarkupLine($"[black]DESIGN[/]");
-// AnsiConsole.MarkupLine($"[gray]- design m stack[/]");
-// AnsiConsole.MarkupLine($"[gray]- design m part[/]");
-// } else if (choice == "Manufacture")
-// {
-// AnsiConsole.MarkupLine($"[black]MANUFACTURE[/]");
-// AnsiConsole.MarkupLine($"[gray]- view WC[/]");
-
-// }
-
-
-/// design
-/// manufacture
-
-
-//// view work centers
-///         wcq
-///             ops
-/// 
-/// 
-/// view work orders
-/// view inventory
-/// view manufacturing catalog 
-/// 
-/// 
-/// 
-
-// well I would like it to help me keep track of things i am buiulding
-// those things may take months to produce
-
-// I would also like the app to help me design
-
-// and actually what this app does is help prototype the design and manufacture of products
