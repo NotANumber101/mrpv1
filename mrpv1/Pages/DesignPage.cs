@@ -15,7 +15,12 @@ public class DesignPage() : Page
         PartController partController = new();
 
 
-
+enum PageTitle
+{
+    DesignPage,
+    ManufacturePage,
+    PartPage
+};
 
     //TODO CASE ANALYSIS
     // all cases

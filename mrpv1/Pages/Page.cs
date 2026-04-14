@@ -1,62 +1,54 @@
 using System;
-using Spectre;
-using Spectre.Console;
 using Npgsql;
+using Spectre.Console;
 
 namespace mrpv1.Pages;
 
 public class Page()
-
 {
-    public async Task MainMenuWithConfirm()
+    enum PageTitle
     {
-        if (AnsiConsole.Confirm("Return to main menu?"))
-        {
-            AnsiConsole.MarkupLine("[gray]Returning to main menu...[/]");
-            await MainMenu();
-        }
+        DesignPage,
+        ManufacturePage,
+        PartPage
     }
     public async Task MainMenu()
     {
-        var pageOptions = new List<string> { "design", "manufacture", "inventory" };
+        var pageOptions = new List<PageTitle>
+        {
+            PageTitle.DesignPage, PageTitle.ManufacturePage, PageTitle.PartPage
+        };
         var pageChoice = AnsiConsole.Prompt(
-            new SelectionPrompt<string>()
-                .Title("[green]Select a page to view:[/]")
+            new SelectionPrompt<PageTitle>()
+                .Title("[green]Main Menu[/]")
                 .PageSize(10)
                 .AddChoices(pageOptions));
-        await PageRedirect(pageChoice);
+        await Redirect(pageChoice);
     }
-
-    public async Task PageRedirect(string pageChoice)
+    private async Task Redirect(PageTitle pageTitle)
     {
-        if (pageChoice == "design")
+        switch (pageTitle)
         {
-            await new DesignPage().Display();
-
-        }
-        else if (pageChoice == "inventory")
-        {
-            await new PartPage().Display();
-        }
-        else if (pageChoice == "manufacture")
-        {
-            await new ManufacturePage().Display();
-        }
-        else
-        {
-            throw new ArgumentOutOfRangeException(nameof(pageChoice), $"Not expected direction value: {pageChoice}");
+            case PageTitle.DesignPage:
+                await new DesignPage().Display();
+                break;
+            case PageTitle.ManufacturePage:
+                await new ManufacturePage().Display();
+                break;
+            case PageTitle.PartPage:
+                await new PartPage().Display();
+                break;
         }
     }
-
+    public async Task MainMenuWithConfirm()
+    {
+        if (AnsiConsole.Confirm("Return to Main Menu?"))
+        {
+            await MainMenu();
+        }
+    }
     public async Task ClearDisplay()
     {
         AnsiConsole.Clear();
     }
-
 }
-
-
-// Dictionary<string, string> pageMessages = new Dictionary<string, string>
-// {
-//     { "fallback", "message" }
-// };

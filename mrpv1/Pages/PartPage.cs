@@ -19,23 +19,15 @@ public class PartPage() : Page
     }
     public async Task CreatePart()
     {
-        // todo, a function thats seeds the db with my locations enums
         var parts = await partController.GetParts();
-        foreach(Part part in parts)
+        foreach (Part part in parts)
         {
-
-
-
-
             Console.WriteLine($"PartId: {part.Id}, PartName: {part.Name}");
             Console.WriteLine($"InventoryId: {part.InventoryId}, Quantity: {part.Quantity}");
-            
         }
-
         string partName = AnsiConsole.Ask<string>($"[green]partname:[/]");
-            Console.WriteLine("Select Inventory location for the new part");
-                // var pageOptions = new List<string> { "design", "manufacture" };
-                var partInventoryOptions= new List<Locations.InventoryLocations>
+        Console.WriteLine("Select Inventory location for the new part");
+        var partInventoryOptions = new List<Locations.InventoryLocations>
                 {
                     Locations.InventoryLocations.CabinetA,
                     Locations.InventoryLocations.ClosetA,
@@ -43,19 +35,14 @@ public class PartPage() : Page
                     Locations.InventoryLocations.Garage,
                     Locations.InventoryLocations.Kitchen
                 };
-
-
         var partInventoryLocation = AnsiConsole.Prompt(
             new SelectionPrompt<Locations.InventoryLocations>()
                 .Title("[green]Select a page to view:[/]")
                 .PageSize(10)
                 .AddChoices(partInventoryOptions));
 
-        int locationId = (int) partInventoryLocation;
+        int locationId = (int)partInventoryLocation;
 
-
-
-        /// INSERT OPERATION
         Part newPart = new()
         {
             InventoryId = locationId,
@@ -63,15 +50,13 @@ public class PartPage() : Page
             Quantity = 0
         };
 
-
         await partController.CreatePart(newPart);
-
-
 
         if (AnsiConsole.Confirm("Create more Parts?"))
         {
             await CreatePart();
-        } else
+        }
+        else
         {
             await new PartPage().Display();
         }
