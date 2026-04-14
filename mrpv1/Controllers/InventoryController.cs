@@ -14,8 +14,8 @@ public class InventoryController()
 
     public async Task<List<Part>> GetParts()
     {
-        AnsiConsole.MarkupLine("[gray]Fetching[/]");
-        AnsiConsole.MarkupLine("    -> [gray]Get Parts..[/]");
+        // AnsiConsole.MarkupLine("[gray]Fetching[/]");
+        // AnsiConsole.MarkupLine("    -> [gray]Get Parts..[/]");
         List<Part> parts = [];
         try
         {
@@ -33,7 +33,7 @@ public class InventoryController()
                     Part newPart = new() { Id = partId, InventoryId = inventoryId, Name = partName, Quantity = quantity };
                     parts.Add(newPart);
                 }
-            AnsiConsole.MarkupLine($"        -> [green]Done.[/]");
+            // AnsiConsole.MarkupLine($"        -> [green]Done.[/]");
             return parts;
         }
         catch (NpgsqlException e)
@@ -43,10 +43,36 @@ public class InventoryController()
         }
         return parts;
     }
+    public async Task<Part> GetPart(int id)
+    {
+                    Part part = new() {Name="Not found", InventoryId=id};
+        try
+        {
+            await using var dataSource = dbBuilder.BuildMultiHost();
+            await using (var cmd = dataSource.CreateCommand($"SELECT * FROM part WHERE id={id};"))
+
+            await using (var reader = await cmd.ExecuteReaderAsync())
+
+                while (await reader.ReadAsync())
+                {
+                    part.Id = reader.GetInt32(0);
+                    part.InventoryId = reader.GetInt32(1);
+                    part.Name = reader.GetString(2);
+                    part.Quantity = reader.GetInt32(3);
+                    // Part part = new() { Id = equipmentId, InventoryId = inventoryId, Name = equipmentName, Quantity = quantity };
+                }
+        }
+        catch (NpgsqlException e)
+        {
+            Console.WriteLine("Failed.");
+            Console.WriteLine(e.Message);
+        }
+        return part;
+    }
     public async Task<List<Equipment>> GetEquipments()
     {
-        AnsiConsole.MarkupLine("[gray]Fetching[/]");
-        AnsiConsole.MarkupLine("    -> [gray]Get Equipments..[/]");
+        // AnsiConsole.MarkupLine("[gray]Fetching[/]");
+        // AnsiConsole.MarkupLine("    -> [gray]Get Equipments..[/]");
         List<Equipment> equipments = [];
         try
         {
@@ -76,8 +102,8 @@ public class InventoryController()
     }
     public async Task<List<Material>> GetMaterials()
     {
-        AnsiConsole.MarkupLine("[gray]Fetching[/]");
-        AnsiConsole.MarkupLine("    -> [gray]Get Materials..[/]");
+        // AnsiConsole.MarkupLine("[gray]Fetching[/]");
+        // AnsiConsole.MarkupLine("    -> [gray]Get Materials..[/]");
         List<Material> materials = [];
         try
         {
@@ -95,7 +121,7 @@ public class InventoryController()
                     Material newMaterial = new() { Id = materialId, InventoryId = inventoryId, Name = materialName, Quantity = quantity };
                     materials.Add(newMaterial);
                 }
-            AnsiConsole.MarkupLine($"        -> [green]Done.[/]");
+            // AnsiConsole.MarkupLine($"        -> [green]Done.[/]");
             return materials;
         }
         catch (NpgsqlException e)
@@ -107,8 +133,8 @@ public class InventoryController()
     }
     public async Task<List<Tool>> GetTools()
     {
-        AnsiConsole.MarkupLine("[gray]Fetching[/]");
-        AnsiConsole.MarkupLine("    -> [gray]Get Tools..[/]");
+        // AnsiConsole.MarkupLine("[gray]Fetching[/]");
+        // AnsiConsole.MarkupLine("    -> [gray]Get Tools..[/]");
         List<Tool> tools = [];
         try
         {
@@ -126,7 +152,7 @@ public class InventoryController()
                     Tool newTool = new() { Id = toolId, InventoryId = inventoryId, Name = toolName, Quantity = quantity };
                     tools.Add(newTool);
                 }
-            AnsiConsole.MarkupLine($"        -> [green]Done.[/]");
+            // AnsiConsole.MarkupLine($"        -> [green]Done.[/]");
             return tools;
         }
         catch (NpgsqlException e)
@@ -136,14 +162,45 @@ public class InventoryController()
         }
         return tools;
     }
+    public async Task<List<Inventory>> GetInventories()
+    {
+        // AnsiConsole.MarkupLine("[gray]Fetching[/]");
+        // AnsiConsole.MarkupLine("    -> [gray]Get Inventories..[/]");
+        List<Inventory> inventories = [];
+        try
+        {
+            await using var dataSource = dbBuilder.BuildMultiHost();
+            await using (var getInventoriesCommand = dataSource.CreateCommand("SELECT * FROM inventory;"))
+
+            await using (var reader = await getInventoriesCommand.ExecuteReaderAsync())
+
+                while (await reader.ReadAsync())
+                {
+                    int inventoryId = reader.GetInt32(0);
+                    string inventoryLocation = reader.GetString(2);
+                    string inventoryDescription = reader.GetString(2);
+                    Inventory inventory = new() { Id = inventoryId, Location = inventoryLocation, Description = inventoryDescription };
+                    inventories.Add(inventory);
+                }
+            // AnsiConsole.MarkupLine($"        -> [green]Done.[/]");
+            return inventories;
+        }
+        catch (NpgsqlException e)
+        {
+            Console.WriteLine("Failed.");
+            Console.WriteLine(e.Message);
+        }
+        return inventories;
+    }
+
 
 
 
 
     public async Task<List<Machine>> GetMachines()
     {
-        AnsiConsole.MarkupLine("[gray]Fetching[/]");
-        AnsiConsole.MarkupLine("    -> [gray]GetMachine..[/]");
+        // AnsiConsole.MarkupLine("[gray]Fetching[/]");
+        // AnsiConsole.MarkupLine("    -> [gray]GetMachine..[/]");
         List<Machine> machines = [];
         try
         {
@@ -161,7 +218,7 @@ public class InventoryController()
                     Machine newMachine = new() { Id = machineId, InventoryId = inventoryId, Name = machineName, Quantity = quantity };
                     machines.Add(newMachine);
                 }
-            AnsiConsole.MarkupLine($"        -> [green]Done.[/]");
+            // AnsiConsole.MarkupLine($"        -> [green]Done.[/]");
             return machines;
         }
         catch (NpgsqlException e)

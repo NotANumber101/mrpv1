@@ -13,6 +13,7 @@ public class DesignPage() : Page
 
 {
     PartController partController = new();
+    OperationController operationController = new();
     public async Task Display()
     {
         Console.WriteLine("DESIGN PAGE");
@@ -70,13 +71,21 @@ public class DesignPage() : Page
         // todo, a function thats seeds the db with my locations enums
         if (AnsiConsole.Confirm("Display Inventory?"))
         {
-            // var left = new Panel("Left content").Header("Panel 1").Expand();
-            // var right = new Panel("Right content").Header("Panel 2");
+            await new InventoryPage().DisplayInventory();
+        }
+        AnsiConsole.MarkupLine("to cancel, type: abort");
+        AnsiConsole.MarkupLine("to part on the fly, type: newpart");
 
-            // PARTS
-
-            // AnsiConsole.Write(new Columns(left, right));
-            // await new PartPage().DisplayPartTable();
+        string operationInstruction = AnsiConsole.Ask<string>($"[green]op instructions: [/]");
+        if (operationInstruction == "abort")
+        {
+            await Display();
+        }
+        if (operationInstruction == "newpart")
+        {
+            int partId = await new InventoryPage().CreatePart();
+            Console.WriteLine($"New part created: {partId}");
+            await CreateOperation();
         }
 
         int partProduced = AnsiConsole.Ask<int>($"[green]Inventory Part Produced: [/]");
@@ -84,26 +93,65 @@ public class DesignPage() : Page
         int partConsumed = AnsiConsole.Ask<int>($"[green]Inventory Part Consumed: [/]");
         int mPartProduced = AnsiConsole.Ask<int>($"[green]Manufacture Part Produced: [/]");
         int mPartConsumed = AnsiConsole.Ask<int>($"[green]Manufacture Part Consumed: [/]");
-        string operationInstruction = AnsiConsole.Ask<string>($"[green]op instructions: [/]");
-
-        /// INSERT OPERATION
+        int equipment = AnsiConsole.Ask<int>($"[green]equipment: [/]");
+        int material = AnsiConsole.Ask<int>($"[green]material: [/]");
+        int machine = AnsiConsole.Ask<int>($"[green]machine: [/]");
+        int tool = AnsiConsole.Ask<int>($"[green]tool: [/]");
+                /// INSERT OPERATION
         Operation newOp = new()
         {
             Instruction = operationInstruction,
             PartConsumed = partConsumed,
             PartProduced = partProduced,
             MPartConsumed = mPartConsumed,
-            MPartProduced = mPartProduced
+            MPartProduced = mPartProduced,
+            Material = material,
+            Tool = tool,
+            Equipment = equipment,
+            Machine = machine
         };
-        await new OperationController().CreateOperation(newOp);
+        await operationController.CreateOperation(newOp);
+        
+
+
+
         if (AnsiConsole.Confirm("Create more operations?"))
         {
             await CreateOperation();
         }
         else
         {
-            await new DesignPage().Display();
+            await DisplayOperationsTable();
         }
+    }
+    public async Task DisplayOperationsTable()
+    {
+        Console.WriteLine("Operations");
+        var table = new Table().Title("operations")
+            .AddColumn("Id")
+            .AddColumn("Instructions")
+            .AddColumn("pProduced")
+            .AddColumn("pConsumed")
+            .AddColumn("mpProduced")
+            .AddColumn("mpConsumed")
+            .AddColumn("material")
+            .AddColumn("tool")
+            .AddColumn("machine")
+            .AddColumn("equipment");
+
+
+        List<Operation> operations = await operationController.GetOperations();
+        foreach (Operation op in operations)
+        {
+            table.AddRow(op.Id.ToString(), op.Instruction,
+            op.PartConsumed.ToString(),
+            op.PartProduced.ToString(),
+            op.MPartConsumed.ToString(),
+            op.MPartProduced.ToString(),
+            op.Material.ToString(), op.Tool.ToString(),
+            op.Machine.ToString(), op.Equipment.ToString());
+        }
+        AnsiConsole.Write(table);
     }
     public async Task CreateMockOperations()
     {

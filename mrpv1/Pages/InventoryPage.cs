@@ -16,6 +16,7 @@ public class InventoryPage() : Page
     public async Task Display()
     {
         await DisplayInventory();
+        await MainMenu();
         // await CreatePart();
     }
     public async Task DisplayInventory()
@@ -31,28 +32,22 @@ public class InventoryPage() : Page
         var toolTable = await ToolTable();
         var equipmentTable = await EquipmentTable();
         var machineTable = await MachineTable();
+        var inventortyTable = await InventoryLocationsTable();
 
 
-var partsPanel = new Panel(partTable).Header("Parts").BorderColor(Color.Black);
-var left1 = new Panel(equipmentTable).Header("Machines").BorderColor(Color.Black);
-var right1 = new Panel(materialTable).Header("Materials").BorderColor(Color.Black);
-var left2 = new Panel(machineTable).Header("Tools").BorderColor(Color.Black);
-var right2 = new Panel(toolTable).Header("Equipment").BorderColor(Color.Black);
+        var partsPanel = new Panel(partTable).Header("Parts").BorderColor(Color.Black).Expand();
+        var inventoryLocationsPanel = new Panel(inventortyTable).Header("Inventory").BorderColor(Color.Black).Expand();
+
+        var left1 = new Panel(equipmentTable).Header("Machines").BorderColor(Color.Black).Expand();
+        var right1 = new Panel(materialTable).Header("Materials").BorderColor(Color.Black).Expand();
+        var left2 = new Panel(machineTable).Header("Tools").BorderColor(Color.Black).Expand();
+        var right2 = new Panel(toolTable).Header("Equipment").BorderColor(Color.Black).Expand();
 
 
-        AnsiConsole.Write(partsPanel);
-        AnsiConsole.Write(new Columns(left1, right1));
-        AnsiConsole.Write(new Columns(left2, right2));
-    }
-    public async Task<Table> PartTable()
-    {
-        var myTable = InventoryItemTableBuilder("parts");
-        var inventoryItems = await inventoryController.GetParts();
-        foreach (Part inventoryItem in inventoryItems)
-        {
-            myTable.AddRow(inventoryItem.Id.ToString(), inventoryItem.InventoryId.ToString(), inventoryItem.Name, inventoryItem.Quantity.ToString());
-        }
-        return myTable;
+        // AnsiConsole.Write(new Columns(partsPanel, inventoryLocationsPanel));
+
+        AnsiConsole.Write(new Columns(left1, right1, right2));
+        AnsiConsole.Write(new Columns(left2, partsPanel, inventoryLocationsPanel));
     }
     public Table InventoryItemTableBuilder(string title)
     {
@@ -64,6 +59,16 @@ var right2 = new Panel(toolTable).Header("Equipment").BorderColor(Color.Black);
         myTable.AddColumn("InvId");
         myTable.AddColumn("Name");
         myTable.AddColumn("Quantity");
+        return myTable;
+    }
+    public async Task<Table> PartTable()
+    {
+        var myTable = InventoryItemTableBuilder("parts");
+        var inventoryItems = await inventoryController.GetParts();
+        foreach (Part inventoryItem in inventoryItems)
+        {
+            myTable.AddRow(inventoryItem.Id.ToString(), inventoryItem.InventoryId.ToString(), inventoryItem.Name, inventoryItem.Quantity.ToString());
+        }
         return myTable;
     }
     public async Task<Table> MaterialTable()
@@ -110,7 +115,23 @@ var right2 = new Panel(toolTable).Header("Equipment").BorderColor(Color.Black);
         return myTable;
 
     }
-    public async Task CreatePart()
+    public async Task<Table> InventoryLocationsTable()
+    {
+        var myTable = new Table()
+    .Title($"[yellow bold]Inventory Locations[/]")
+    .RoundedBorder()
+    .BorderColor(Color.Grey);
+        myTable.AddColumn("Id");
+        myTable.AddColumn("Name");
+        myTable.AddColumn("Description");
+        var inventories = await inventoryController.GetInventories();
+        foreach (Inventory inventory in inventories)
+        {
+            myTable.AddRow(inventory.Id.ToString(), inventory.Location, inventory.Description);
+        }
+        return myTable;
+    }
+    public async Task<int> CreatePart()
     {
         string partName = AnsiConsole.Ask<string>($"[green]partname:[/]");
         var partInventoryOptions = new List<Locations.InventoryLocations>
@@ -135,16 +156,8 @@ var right2 = new Panel(toolTable).Header("Equipment").BorderColor(Color.Black);
             Name = partName,
             Quantity = 0
         };
+        int partId = await partController.CreatePart(newPart);
 
-        await partController.CreatePart(newPart);
-
-        if (AnsiConsole.Confirm("Create more Parts?"))
-        {
-            await CreatePart();
-        }
-        else
-        {
-            await MainMenu();
-        }
+        return partId;
     }
 }

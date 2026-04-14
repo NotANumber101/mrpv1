@@ -5,45 +5,64 @@ using mrpv1.Helpers;
 using mrpv1.Queries;
 using Npgsql;
 using mrpv1.Controllers;
+using mrpv1.Models;
 
 namespace mrpv1.Pages;
 
 public class ManufacturePage() : Page
 
 {
+    readonly InventoryController inventoryController = new();
+    readonly OperationController operationController = new();
     public async Task Display()
     {
         Console.WriteLine("MANUFACTURE PAGE");
-        var pageChoice = AnsiConsole.Prompt(
-            new SelectionPrompt<string>()
-                .Title("[green]Select a wc:[/]")
-                .PageSize(10)
-                .AddChoices(new List<string> { "wc1:kitchen", "wc2:notImplemented" }));
-        if (pageChoice == "wc1:kitchen")
+        await DisplayOperations();
+    }
+    public async Task DisplayOperations()
+    {
+        Console.WriteLine("Operations");
+
+        List<Operation> operations = await operationController.GetOperations();
+        foreach (Operation op in operations)
         {
-
-
-
-            Console.WriteLine("Welcome: wc1:kitchen");
-            Console.WriteLine("current work in progress: Producing = colonized tub");
-            Console.WriteLine("------------------------------- WorkOrderId: 100");
-            Console.WriteLine("------------------------------------- PartId: 700");
-            Console.WriteLine("------------------------------------- PartInstanceId: 400");
-            Console.WriteLine("WORK CENTER QUEUE");
-
-            ExamplePrintOperationStack();
-
-
-        }
-        else if (pageChoice == "wc2:notImplemented")
-        {
-            Console.WriteLine("Welcome: wc2:notImplemented");
-        }
-        else
-        {
-            Console.WriteLine("Unknown WC...");
+            await DisplayOperationPanel(op);
         }
     }
+    public async Task DisplayOperationPanel(Operation operation)
+    {
+        Part part = await inventoryController.GetPart(operation.Id);
+        Console.WriteLine("Operation Details");
+        AnsiConsole.Write(new Panel($"{operation.Instruction}, consumes: {part.Name}"));
+    }
+    public async Task CreateOperation()
+    {
+        string opInstructionInput = AnsiConsole.Ask<string>($"[green]Instructions:[/]");
+
+        Operation newOp = new()
+        {
+            Instruction = opInstructionInput
+        };
+        await operationController.CreateOperation(newOp);
+        if (AnsiConsole.Confirm("Return?"))
+        {
+            await MainMenu();
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     public void ExamplePrintOperationStack()
     {
         Console.WriteLine("WORK CENTER QUEUE");

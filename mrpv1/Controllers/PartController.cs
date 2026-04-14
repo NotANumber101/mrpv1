@@ -43,8 +43,9 @@ public class PartController()
         }
         return parts;
     }
-    public async Task CreatePart(Part part)
+    public async Task<int> CreatePart(Part part)
     {
+        int newPartId = 0;
         AnsiConsole.MarkupLine("[gray]Inserting data...[/]");
         AnsiConsole.MarkupLine("    -> [gray]Create Part[/]");
         try
@@ -54,7 +55,7 @@ public class PartController()
             await using var transaction = await connection.BeginTransactionAsync();
 
             await using var createPartCommand = new NpgsqlCommand(PartQueries.CreatePart(part), connection, transaction);
-            await createPartCommand.ExecuteNonQueryAsync();
+            newPartId = await createPartCommand.ExecuteNonQueryAsync();
 
             await transaction.CommitAsync();
             AnsiConsole.MarkupLine($"        -> [green]Done.[/]");
@@ -64,6 +65,7 @@ public class PartController()
             Console.WriteLine("Failed.");
             Console.WriteLine(e.Message);
         }
+        return newPartId;
     }
 
 }
