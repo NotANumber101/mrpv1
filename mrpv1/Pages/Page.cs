@@ -9,15 +9,17 @@ public class Page()
     {
         DesignPage,
         ManufacturePage,
-        PartPage
+        InventoryPage,
+        OrderPage
     }
     public async Task MainMenu()
     {
         var pageOptions = new List<PageTitle>
         {
-            PageTitle.DesignPage, PageTitle.ManufacturePage, PageTitle.PartPage
+            PageTitle.DesignPage, PageTitle.ManufacturePage,
+            PageTitle.InventoryPage, PageTitle.OrderPage
         };
-        var pageChoice = AnsiConsole.Prompt(
+        PageTitle pageChoice = AnsiConsole.Prompt(
             new SelectionPrompt<PageTitle>()
                 .Title("[green]Main Menu[/]")
                 .PageSize(10)
@@ -35,8 +37,11 @@ public class Page()
             case PageTitle.ManufacturePage:
                 await new ManufacturePage().Display();
                 break;
-            case PageTitle.PartPage:
-                await new PartPage().Display();
+            case PageTitle.InventoryPage:
+                await new InventoryPage().Display();
+                break;
+            case PageTitle.OrderPage:
+                await new OrderPage().Display();
                 break;
         }
     }

@@ -12,6 +12,7 @@ namespace mrpv1.Pages;
 public class DesignPage() : Page
 
 {
+    PartController partController = new();
     public async Task Display()
     {
         Console.WriteLine("DESIGN PAGE");
@@ -67,9 +68,15 @@ public class DesignPage() : Page
     public async Task CreateOperation()
     {
         // todo, a function thats seeds the db with my locations enums
-        if (AnsiConsole.Confirm("Display PARTS?"))
+        if (AnsiConsole.Confirm("Display Inventory?"))
         {
-            await new PartPage().DisplayPartTable();
+            // var left = new Panel("Left content").Header("Panel 1").Expand();
+            // var right = new Panel("Right content").Header("Panel 2");
+
+            // PARTS
+
+            // AnsiConsole.Write(new Columns(left, right));
+            // await new PartPage().DisplayPartTable();
         }
 
         int partProduced = AnsiConsole.Ask<int>($"[green]Inventory Part Produced: [/]");
