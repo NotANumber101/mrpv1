@@ -74,7 +74,7 @@ public class DesignPage() : Page
             await new InventoryPage().DisplayInventory();
         }
         AnsiConsole.MarkupLine("to cancel, type: abort");
-        AnsiConsole.MarkupLine("to part on the fly, type: newpart");
+        AnsiConsole.MarkupLine("to create part on the fly, type: newpart");
 
         string operationInstruction = AnsiConsole.Ask<string>($"[green]op instructions: [/]");
         if (operationInstruction == "abort")

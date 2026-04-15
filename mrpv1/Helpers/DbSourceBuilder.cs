@@ -1,3 +1,4 @@
+using mrpv1.Models;
 using Npgsql;
 
 namespace mrpv1.Helpers;
@@ -14,7 +15,9 @@ public class DbSourceBuilder(string host)
         // using ILoggerFactory factory = LoggerFactory.Create(builder => builder.AddConsole());
         var npgsqlDataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString+loadBalanaceHosts+targetSessionAttributes);
         return npgsqlDataSourceBuilder
-            .EnableParameterLogging(true);
+            .EnableParameterLogging(true)
+            .MapEnum<Inventory.Locations>()
+            .MapComposite<Inventory>();
             // .UseLoggerFactory(factory);
     }
 }

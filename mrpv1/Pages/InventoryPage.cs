@@ -138,9 +138,9 @@ public class InventoryPage() : Page
                 {
                     Locations.InventoryLocations.CabinetA,
                     Locations.InventoryLocations.ClosetA,
-                    Locations.InventoryLocations.Fridge,
-                    Locations.InventoryLocations.Garage,
-                    Locations.InventoryLocations.Kitchen
+                    Locations.InventoryLocations.Fridge
+                    // Locations.InventoryLocations.Garage,
+                    // Locations.InventoryLocations.Kitchen
                 };
         var partInventoryLocation = AnsiConsole.Prompt(
             new SelectionPrompt<Locations.InventoryLocations>()

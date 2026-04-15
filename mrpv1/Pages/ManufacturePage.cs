@@ -17,6 +17,7 @@ public class ManufacturePage() : Page
     public async Task Display()
     {
         Console.WriteLine("MANUFACTURE PAGE");
+        await new WorkCenterPage().Display();
         await DisplayOperations();
     }
     public async Task DisplayOperations()
@@ -31,9 +32,10 @@ public class ManufacturePage() : Page
     }
     public async Task DisplayOperationPanel(Operation operation)
     {
-        Part part = await inventoryController.GetPart(operation.Id);
+        Part partConsumed = await inventoryController.GetPart(operation.PartConsumed);
+        Part partProduced = await inventoryController.GetPart(operation.PartProduced);
         Console.WriteLine("Operation Details");
-        AnsiConsole.Write(new Panel($"{operation.Instruction}, consumes: {part.Name}"));
+        AnsiConsole.Write(new Panel($"{operation.Instruction}, produces: {partProduced.Name}({partProduced.Id})\nconsumes: {partConsumed.Name}({partConsumed.Id})"));
     }
     public async Task CreateOperation()
     {

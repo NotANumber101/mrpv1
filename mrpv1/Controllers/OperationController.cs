@@ -29,7 +29,20 @@ public class OperationController()
 
                     int operationId = reader.GetInt32(0);
                     string operationInstruction = reader.GetString(1);
-                    Operation newOp = new() { Id = operationId, Instruction = operationInstruction };
+                    int partProduced = reader.GetInt32(2);
+                    int partConsumed = reader.GetInt32(3);
+                    int mPartProduced = reader.GetInt32(4);
+                    int mPartConsumed = reader.GetInt32(5);
+                    int material = reader.GetInt32(6);
+                    int tool = reader.GetInt32(7);
+                    int equipment = reader.GetInt32(8);
+                    int machine = reader.GetInt32(9);
+                    Operation newOp = new() {
+                        Id = operationId, Instruction = operationInstruction,
+                        PartProduced = partProduced, PartConsumed = partConsumed,
+                        MPartProduced = mPartConsumed, MPartConsumed = mPartConsumed,
+                        Material = material, Tool = tool, Equipment = equipment, Machine = machine
+                        };
                     operations.Add(newOp);
                 }
             AnsiConsole.MarkupLine($"        -> [green]Done.[/]");

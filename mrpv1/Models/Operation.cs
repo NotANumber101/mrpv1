@@ -1,4 +1,5 @@
 namespace mrpv1.Models;
+
 public class Operation()
 {
     public int Id { get; set; }
@@ -11,6 +12,4 @@ public class Operation()
     public int Tool { get; set; }
     public int Equipment { get; set; }
     public int Machine { get; set; }
-// estimated time
-
 }

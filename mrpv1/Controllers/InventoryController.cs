@@ -12,6 +12,56 @@ public class InventoryController()
     private static readonly string multiHost = "db,localhost";
     readonly NpgsqlDataSourceBuilder dbBuilder = new DbSourceBuilder(multiHost).Builder();
 
+
+    public async Task GetIlocations()
+    {
+        try
+        {
+            await using var dataSource = dbBuilder.BuildMultiHost();
+            await using (var getPartsCommand = dataSource.CreateCommand("SELECT location from inventory;"))
+
+            await using (var reader = await getPartsCommand.ExecuteReaderAsync())
+
+                while (await reader.ReadAsync())
+                {
+                    var enumValue = reader.GetFieldValue<string>(0);
+                    Console.WriteLine($"--ENUM VALLLLLUUUEEE: {enumValue}");
+                }
+        }
+        catch (NpgsqlException e)
+        {
+            Console.WriteLine("Failed.");
+            Console.WriteLine(e.Message);
+        }
+        // return parts;
+
+
+
+
+
+
+
+
+
+
+
+        // // List<Inventory.Locations> iLocations = [];
+        // // Reading
+        // await using var dataSource = dbBuilder.BuildMultiHost();
+
+        // await using var connection = await dataSource.OpenConnectionAsync();
+
+        // await using (var cmd = new NpgsqlCommand("SELECT location from inventory", connection))
+        // await using (var reader = cmd.ExecuteReaderAsync())
+        // while (await reader.read{
+
+        //     reader.Read();
+        //     var enumValue = reader.GetFieldValue<string>(0);
+        //     Console.WriteLine($"ENUM VALLLLLUUUEEE: {enumValue}");
+        //     // iLocations.Add(enumValue);
+        // }
+        // // return iLocations;
+    }
     public async Task<List<Part>> GetParts()
     {
         // AnsiConsole.MarkupLine("[gray]Fetching[/]");
@@ -45,7 +95,7 @@ public class InventoryController()
     }
     public async Task<Part> GetPart(int id)
     {
-                    Part part = new() {Name="Not found", InventoryId=id};
+        Part part = new() { Name = "Not found", InventoryId = id };
         try
         {
             await using var dataSource = dbBuilder.BuildMultiHost();
