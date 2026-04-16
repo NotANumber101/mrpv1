@@ -17,42 +17,42 @@ public class OperationController()
         AnsiConsole.MarkupLine("[gray]Fetching[/]");
         AnsiConsole.MarkupLine("    -> [gray]Get all operations[/]");
         List<Operation> operations = [];
-        try
-        {
-            await using var dataSource = dbBuilder.BuildMultiHost();
-            await using (var getOperationsCommand = dataSource.CreateCommand(OperationQueries.GetOperations()))
+        // try
+        // {
+        //     await using var dataSource = dbBuilder.BuildMultiHost();
+        //     await using (var getOperationsCommand = dataSource.CreateCommand(OperationQueries.GetOperations()))
 
-            await using (var reader = await getOperationsCommand.ExecuteReaderAsync())
+        //     await using (var reader = await getOperationsCommand.ExecuteReaderAsync())
 
-                while (await reader.ReadAsync())
-                {
+        //         while (await reader.ReadAsync())
+        //         {
 
-                    int operationId = reader.GetInt32(0);
-                    string operationInstruction = reader.GetString(1);
-                    int partProduced = reader.GetInt32(2);
-                    int partConsumed = reader.GetInt32(3);
-                    int mPartProduced = reader.GetInt32(4);
-                    int mPartConsumed = reader.GetInt32(5);
-                    int material = reader.GetInt32(6);
-                    int tool = reader.GetInt32(7);
-                    int equipment = reader.GetInt32(8);
-                    int machine = reader.GetInt32(9);
-                    Operation newOp = new() {
-                        Id = operationId, Instruction = operationInstruction,
-                        PartProduced = partProduced, PartConsumed = partConsumed,
-                        MPartProduced = mPartConsumed, MPartConsumed = mPartConsumed,
-                        Material = material, Tool = tool, Equipment = equipment, Machine = machine
-                        };
-                    operations.Add(newOp);
-                }
-            AnsiConsole.MarkupLine($"        -> [green]Done.[/]");
-            return operations;
-        }
-        catch (NpgsqlException e)
-        {
-            Console.WriteLine("Failed.");
-            Console.WriteLine(e.Message);
-        }
+        //             int operationId = reader.GetInt32(0);
+        //             string operationInstruction = reader.GetString(1);
+        //             int partProduced = reader.GetInt32(2);
+        //             int partConsumed = reader.GetInt32(3);
+        //             int mPartProduced = reader.GetInt32(4);
+        //             int mPartConsumed = reader.GetInt32(5);
+        //             int material = reader.GetInt32(6);
+        //             int tool = reader.GetInt32(7);
+        //             int equipment = reader.GetInt32(8);
+        //             int machine = reader.GetInt32(9);
+        //             Operation newOp = new() {
+        //                 Id = operationId, Instruction = operationInstruction,
+        //                 PartProduced = partProduced, PartConsumed = partConsumed,
+        //                 MPartProduced = mPartConsumed, MPartConsumed = mPartConsumed,
+        //                 Material = material, Tool = tool, Equipment = equipment, Machine = machine
+        //                 };
+        //             operations.Add(newOp);
+        //         }
+        //     AnsiConsole.MarkupLine($"        -> [green]Done.[/]");
+        //     return operations;
+        // }
+        // catch (NpgsqlException e)
+        // {
+        //     Console.WriteLine("Failed.");
+        //     Console.WriteLine(e.Message);
+        // }
         return operations;
     }
     public async Task CreateOperation(Operation newOp)
@@ -77,7 +77,37 @@ public class OperationController()
             Console.WriteLine(e.Message);
         }
     }
+     public async Task<List<OpExecution>> GetWorkOrderOpExecutions(int workOrderQueueId)
+    {
+        {
+            List<OpExecution> opExecutions = [];
+            try
+            {
+                await using var dataSource = dbBuilder.BuildMultiHost();
+                await using (var cmd = dataSource.CreateCommand($"SELECT * FROM op_execution WHERE workOrderQueueId={workOrderQueueId};"))
 
+                await using (var reader = await cmd.ExecuteReaderAsync())
+
+                    while (await reader.ReadAsync())
+                    {
+                        OpExecution opExecution = new ()
+                        {
+                            Id=reader.GetInt32(0),
+                            OperationId=reader.GetInt32(1),
+                            WorkOrderQueueId=reader.GetInt32(2),
+                            ExecutionLog=reader.GetString(3)
+                        };
+                        opExecutions.Add(opExecution);
+                    }
+            }
+            catch (NpgsqlException e)
+            {
+                Console.WriteLine("Failed.");
+                Console.WriteLine(e.Message);
+            }
+            return opExecutions;
+        }
+    }
 }
 
 

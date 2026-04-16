@@ -13,11 +13,11 @@ public class WorkCenterController()
     readonly NpgsqlDataSourceBuilder dbBuilder = new DbSourceBuilder(multiHost).Builder();
     readonly string getWorkCentersQuery = WorkCenterQueries.GetWorkCenters();
 
-    public async Task<List<string>> GetWorkCenters()
+    public async Task<List<WorkCenter>> GetWorkCenters()
     {
         AnsiConsole.MarkupLine("[gray]Fetching data...[/]");
         AnsiConsole.MarkupLine("    -> [gray]Fetching work centers..[/]");
-        List<string> workcenters = [];
+        List<WorkCenter> workcenters = [];
         try
         {
             await using var dataSource = dbBuilder.BuildMultiHost();
@@ -27,8 +27,12 @@ public class WorkCenterController()
 
                 while (await reader.ReadAsync())
                 {
-                    string wcName = reader.GetString(0);
-                    workcenters.Add(wcName);
+                    
+                    int id = reader.GetInt32(0);
+                    string name = reader.GetString(2);
+                    string location = reader.GetString(1);
+                    WorkCenter wc = new WorkCenter() {Id=id, Name=name, Location=location};
+                    workcenters.Add(wc);
                 }
             AnsiConsole.MarkupLine($"        -> [green]Done. [/][gray]Work centers found.[/]");
             return workcenters;
@@ -39,5 +43,27 @@ public class WorkCenterController()
             Console.WriteLine(e.Message);
         }
         return workcenters;
+    }
+    public async Task<int> GetWorkCenterQueue(int workCenterId)
+    {
+        int wcqid = 1000000000;
+        try
+        {
+            await using var dataSource = dbBuilder.BuildMultiHost();
+            await using (var cmd = dataSource.CreateCommand($"SELECT * FROM work_center_queue WHERE workCenterId={workCenterId};"))
+
+            await using (var reader = await cmd.ExecuteReaderAsync())
+
+                while (await reader.ReadAsync())
+                {
+                    wcqid = reader.GetInt32(0);
+                }
+        }
+        catch (NpgsqlException e)
+        {
+            Console.WriteLine("Failed.");
+            Console.WriteLine(e.Message);
+        }
+        return wcqid;
     }
 }

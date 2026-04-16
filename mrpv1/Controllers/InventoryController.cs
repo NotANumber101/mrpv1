@@ -24,6 +24,7 @@ public class InventoryController()
 
                 while (await reader.ReadAsync())
                 {
+
                     var enumValue = reader.GetFieldValue<string>(0);
                     Console.WriteLine($"--ENUM VALLLLLUUUEEE: {enumValue}");
                 }

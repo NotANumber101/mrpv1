@@ -98,19 +98,19 @@ public class DesignPage() : Page
         int machine = AnsiConsole.Ask<int>($"[green]machine: [/]");
         int tool = AnsiConsole.Ask<int>($"[green]tool: [/]");
                 /// INSERT OPERATION
-        Operation newOp = new()
-        {
-            Instruction = operationInstruction,
-            PartConsumed = partConsumed,
-            PartProduced = partProduced,
-            MPartConsumed = mPartConsumed,
-            MPartProduced = mPartProduced,
-            Material = material,
-            Tool = tool,
-            Equipment = equipment,
-            Machine = machine
-        };
-        await operationController.CreateOperation(newOp);
+        // Operation newOp = new()
+        // {
+        //     Instruction = operationInstruction,
+        //     PartConsumed = partConsumed,
+        //     PartProduced = partProduced,
+        //     MPartConsumed = mPartConsumed,
+        //     MPartProduced = mPartProduced,
+        //     Material = material,
+        //     Tool = tool,
+        //     Equipment = equipment,
+        //     Machine = machine
+        // };
+        // await operationController.CreateOperation(newOp);
         
 
 
@@ -141,16 +141,16 @@ public class DesignPage() : Page
 
 
         List<Operation> operations = await operationController.GetOperations();
-        foreach (Operation op in operations)
-        {
-            table.AddRow(op.Id.ToString(), op.Instruction,
-            op.PartConsumed.ToString(),
-            op.PartProduced.ToString(),
-            op.MPartConsumed.ToString(),
-            op.MPartProduced.ToString(),
-            op.Material.ToString(), op.Tool.ToString(),
-            op.Machine.ToString(), op.Equipment.ToString());
-        }
+        // foreach (Operation op in operations)
+        // {
+        //     table.AddRow(op.Id.ToString(), op.Instruction,
+        //     op.PartConsumed.ToString(),
+        //     op.PartProduced.ToString(),
+        //     op.MPartConsumed.ToString(),
+        //     op.MPartProduced.ToString(),
+        //     op.Material.ToString(), op.Tool.ToString(),
+        //     op.Machine.ToString(), op.Equipment.ToString());
+        // }
         AnsiConsole.Write(table);
     }
     public async Task CreateMockOperations()

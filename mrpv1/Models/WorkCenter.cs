@@ -2,8 +2,7 @@ namespace mrpv1.Models;
 public class WorkCenter()
 {
     public int Id { get; set; }
-    public required string CompanyName { get; set; }
-    public required string CurrentStatus { get; set; }
-    public DateTime CurrentStatusDate { get; set; }
-    public required string JobDescription { get; set; }
+    public string? Location { get; set; }
+    public string? Name { get; set; }
+    // ?? GET MOCK WCS
 }

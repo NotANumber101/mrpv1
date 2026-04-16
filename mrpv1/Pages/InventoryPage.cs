@@ -22,12 +22,6 @@ public class InventoryPage() : Page
     public async Task DisplayInventory()
     {
         var partTable = await PartTable();
-        // var panel = new Panel(partTable)
-        //     .Header("Server Status")
-        //     .BorderColor(Color.Blue);
-
-
-
         var materialTable = await MaterialTable();
         var toolTable = await ToolTable();
         var equipmentTable = await EquipmentTable();
