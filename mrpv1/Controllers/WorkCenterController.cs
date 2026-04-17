@@ -15,8 +15,6 @@ public class WorkCenterController()
 
     public async Task<List<WorkCenter>> GetWorkCenters()
     {
-        AnsiConsole.MarkupLine("[gray]Fetching data...[/]");
-        AnsiConsole.MarkupLine("    -> [gray]Fetching work centers..[/]");
         List<WorkCenter> workcenters = [];
         try
         {
@@ -34,12 +32,10 @@ public class WorkCenterController()
                     WorkCenter wc = new WorkCenter() {Id=id, Name=name, Location=location};
                     workcenters.Add(wc);
                 }
-            AnsiConsole.MarkupLine($"        -> [green]Done. [/][gray]Work centers found.[/]");
             return workcenters;
         }
         catch (NpgsqlException e)
         {
-            AnsiConsole.MarkupLine($"        -> [red]Failed. [/][gray]Could not fetch work centers.[/]");
             Console.WriteLine(e.Message);
         }
         return workcenters;

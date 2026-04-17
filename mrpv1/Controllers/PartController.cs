@@ -14,8 +14,6 @@ public class PartController()
 
     public async Task<List<Part>> GetParts()
     {
-        AnsiConsole.MarkupLine("[gray]Fetching[/]");
-        AnsiConsole.MarkupLine("    -> [gray]GetParts..[/]");
         List<Part> parts = [];
         try
         {
@@ -31,7 +29,6 @@ public class PartController()
                     Part newPart = new() { Id = partId, Name = partName};
                     parts.Add(newPart);
                 }
-            AnsiConsole.MarkupLine($"        -> [green]Done.[/]");
             return parts;
         }
         catch (NpgsqlException e)
@@ -93,8 +90,6 @@ public class PartController()
     public async Task<int> CreatePart(Part part)
     {
         int newPartId = 0;
-        AnsiConsole.MarkupLine("[gray]Inserting data...[/]");
-        AnsiConsole.MarkupLine("    -> [gray]Create Part[/]");
         try
         {
             await using var dataSource = dbBuilder.BuildMultiHost();
@@ -105,7 +100,6 @@ public class PartController()
             newPartId = await createPartCommand.ExecuteNonQueryAsync();
 
             await transaction.CommitAsync();
-            AnsiConsole.MarkupLine($"        -> [green]Done.[/]");
         }
         catch (NpgsqlException e)
         {

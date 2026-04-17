@@ -27,10 +27,10 @@ public class OperationController()
                 {
                     Operation foundOp = new Operation()
                     {
-                        Id=reader.GetInt32(0),
-                        Instruction=reader.GetString(1),
-                        PartProduced=reader.GetInt32(2),
-                        PartConsumed=reader.GetInt32(3)
+                        Id = reader.GetInt32(0),
+                        Instruction = reader.GetString(1),
+                        PartProduced = reader.GetInt32(2),
+                        PartConsumed = reader.GetInt32(3)
                     };
                     res.Add(foundOp);
                 }
@@ -44,8 +44,6 @@ public class OperationController()
     }
     public async Task<List<Operation>> GetOperations()
     {
-        AnsiConsole.MarkupLine("[gray]Fetching[/]");
-        AnsiConsole.MarkupLine("    -> [gray]Get all operations[/]");
         List<Operation> operations = [];
         try
         {
@@ -61,13 +59,15 @@ public class OperationController()
                     string operationInstruction = reader.GetString(1);
                     int partProduced = reader.GetInt32(2);
                     int partConsumed = reader.GetInt32(3);
-                    Operation newOp = new() {
-                        Id = operationId, Instruction = operationInstruction,
-                        PartProduced = partProduced, PartConsumed = partConsumed
-                        };
+                    Operation newOp = new()
+                    {
+                        Id = operationId,
+                        Instruction = operationInstruction,
+                        PartProduced = partProduced,
+                        PartConsumed = partConsumed
+                    };
                     operations.Add(newOp);
                 }
-            AnsiConsole.MarkupLine($"        -> [green]Done.[/]");
             return operations;
         }
         catch (NpgsqlException e)
@@ -78,20 +78,51 @@ public class OperationController()
         return operations;
     }
     public async Task CreateOperation(Operation newOp)
+
     {
-        AnsiConsole.MarkupLine("[gray]Inserting data...[/]");
-        AnsiConsole.MarkupLine("    -> [gray]Create Operation[/]");
+        List<Part> partsConsumed = new();
+        List<Part> partsProduced = new();
         try
         {
             await using var dataSource = dbBuilder.BuildMultiHost();
             await using var connection = await dataSource.OpenConnectionAsync();
             await using var transaction = await connection.BeginTransactionAsync();
 
-            await using var createOperationCommand = new NpgsqlCommand(OperationQueries.CreateOperation(newOp), connection, transaction);
-            await createOperationCommand.ExecuteNonQueryAsync();
+            await using var cmd1 = new NpgsqlCommand($"SELECT * FROM part WHERE id={newOp.PartProduced}", connection, transaction);
+            await using (var reader = await cmd1.ExecuteReaderAsync())
+                while (await reader.ReadAsync())
+                {
+                    Part partProduced = new Part()
+                    {
+                        Id = reader.GetInt32(0),
+                        Name = reader.GetString(1)
+                    };
+                    partsProduced.Add(partProduced);
+                }
 
-            await transaction.CommitAsync();
-            AnsiConsole.MarkupLine($"        -> [green]Done.[/]");
+            await using var cmd2 = new NpgsqlCommand($"SELECT * FROM part WHERE id={newOp.PartConsumed}", connection, transaction);
+            await using (var reader = await cmd2.ExecuteReaderAsync())
+
+                while (await reader.ReadAsync())
+                {
+
+                    Part partConsumed = new Part()
+                    {
+                        Id = reader.GetInt32(0),
+                        Name = reader.GetString(1)
+                    };
+                    partsConsumed.Add(partConsumed);
+                }
+
+            if (partsConsumed.Any() && partsProduced.Any())
+            {
+                await using var createOperationCommand = new NpgsqlCommand(OperationQueries.CreateOperation(newOp), connection, transaction);
+                await createOperationCommand.ExecuteNonQueryAsync();
+
+                await transaction.CommitAsync();
+            }
+
+
         }
         catch (NpgsqlException e)
         {
@@ -99,7 +130,7 @@ public class OperationController()
             Console.WriteLine(e.Message);
         }
     }
-     public async Task<List<OpExecution>> GetWorkOrderOpExecutions(int workOrderQueueId)
+    public async Task<List<OpExecution>> GetWorkOrderOpExecutions(int workOrderQueueId)
     {
         {
             List<OpExecution> opExecutions = [];
@@ -112,12 +143,12 @@ public class OperationController()
 
                     while (await reader.ReadAsync())
                     {
-                        OpExecution opExecution = new ()
+                        OpExecution opExecution = new()
                         {
-                            Id=reader.GetInt32(0),
-                            OperationId=reader.GetInt32(1),
-                            WorkOrderQueueId=reader.GetInt32(2),
-                            ExecutionLog=reader.GetString(3)
+                            Id = reader.GetInt32(0),
+                            OperationId = reader.GetInt32(1),
+                            WorkOrderQueueId = reader.GetInt32(2),
+                            ExecutionLog = reader.GetString(3)
                         };
                         opExecutions.Add(opExecution);
                     }

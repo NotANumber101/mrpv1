@@ -1,9 +1,4 @@
-using System;
-using Spectre;
 using Spectre.Console;
-using mrpv1.Helpers;
-using mrpv1.Queries;
-using Npgsql;
 using mrpv1.Controllers;
 using mrpv1.Models;
 
@@ -12,16 +7,62 @@ namespace mrpv1.Pages;
 public class DesignPage() : Page
 
 {
-    PartController partController = new();
+    static PartController partController = new();
     OperationController operationController = new();
-    public async Task ExampleGrid1()
+
+    public Table PartsTable(List<Part> parts)
+    {
+        var partsTable = new Table()
+    .Title($"[yellow bold]Parts[/]")
+    .RoundedBorder()
+    .BorderColor(Color.Grey);
+        partsTable.AddColumn("Id");
+        partsTable.AddColumn("Name");
+        // var parts = await partController.GetParts();
+        foreach (Part part in parts)
+        {
+            partsTable.AddRow(part.Id.ToString(), part.Name ?? "");
+        }
+        return partsTable;
+    }
+    public async Task Display()
+
+    {
+        List<Operation> operations = await operationController.GetOperations();
+        List<Part> parts = await partController.GetParts();
+
+        DesignPageLayout(parts, operations);
+
+        var pageOptions = new List<string> { "Create Operation", "Create Part" };
+        var pageChoice = AnsiConsole.Prompt(
+            new SelectionPrompt<string>()
+                .Title("[green]Welcome,[/]")
+                .PageSize(3)
+                .AddChoices(pageOptions));
+        if (pageChoice == "Create Operation")
+        {
+            await CreateOperation();
+        }
+        else if (pageChoice == "Create Part")
+        {
+            string partName = AnsiConsole.Ask<string>("Please enter a part name:");
+            Part newPart = new()
+            {
+                Name = partName
+            };
+            await partController.CreatePart(newPart);
+            AnsiConsole.Clear();
+            await Display();
+        }
+    }
+    public void DesignPageLayout(List<Part> parts, List<Operation> operations)
     {
         // Create main grid
         var mainGrid = new Grid { Expand = true };
         mainGrid.AddColumn();
 
         // Create header
-        var operationsTable = await DisplayOperationsTable();
+        var operationsTable = DisplayOperationsTable(operations);
         // var header = new Panel(table)
         var header = new Panel("[bold yellow]Catalog[/]")
 
@@ -35,7 +76,7 @@ public class DesignPage() : Page
             .Header("Operations")
             .BorderColor(Color.Green);
 
-        var partsTable = await PartTable();
+        var partsTable = PartsTable(parts);
         var inventoryPanel = new Panel(partsTable)
             .Header("Inventory")
             .BorderColor(Color.Black);
@@ -54,60 +95,13 @@ public class DesignPage() : Page
 
         AnsiConsole.Write(mainGrid);
     }
-
-    public Table InventoryItemTableBuilder(string title)
-    {
-        var myTable = new Table()
-            .Title($"[yellow bold]{title}[/]")
-            .RoundedBorder()
-            .BorderColor(Color.Grey);
-        myTable.AddColumn("Id");
-        myTable.AddColumn("Name");
-        // myTable.AddColumn("Quantity");
-        return myTable;
-    }
-    public async Task<Table> PartTable()
-    {
-        var myTable = InventoryItemTableBuilder("parts");
-        var parts = await partController.GetParts();
-        foreach (Part part in parts)
-        {
-            myTable.AddRow(part.Id.ToString(), part.Name ?? "");
-        }
-        return myTable;
-    }
-    public async Task Display()
-    {
-        await ExampleGrid1();
-        // u should start with part consumed, not produced. then wrok tyour way to a solution (part produced)
-        var pageOptions = new List<string> { "Create Operation", "Create Part" };
-        var pageChoice = AnsiConsole.Prompt(
-            new SelectionPrompt<string>()
-                .Title("[green]Welcome,[/]")
-                .PageSize(10)
-                .AddChoices(pageOptions));
-        if (pageChoice == "Create Operation")
-        {
-            await CreateOperation();
-        }
-        else if (pageChoice == "Create Part")
-        {
-            string partName = AnsiConsole.Ask<string>("Please enter a part name");
-            Part newPart = new()
-            {
-                Name = partName
-            };
-            await partController.CreatePart(newPart);
-        }
-    }
-    public async Task<Table> DisplayOperationsTable()
+    public Table DisplayOperationsTable(List<Operation> operations)
     {
         var table = new Table().Title("operations")
             .AddColumn("Id")
             .AddColumn("Instructions")
             .AddColumn("pConsumed")
             .AddColumn("pProduced");
-        List<Operation> operations = await operationController.GetOperations();
         foreach (Operation op in operations)
         {
             table.AddRow(
