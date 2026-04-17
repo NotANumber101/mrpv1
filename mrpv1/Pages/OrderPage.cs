@@ -1,9 +1,4 @@
-using System;
-using Spectre;
 using Spectre.Console;
-using mrpv1.Helpers;
-using mrpv1.Queries;
-using Npgsql;
 using mrpv1.Controllers;
 using mrpv1.Models;
 
@@ -12,17 +7,29 @@ namespace mrpv1.Pages;
 public class OrderPage() : Page
 
 {
-    // readonly OrderController orderController = new();
+    WorkOrderController workOrderController = new ();
+    PartController partController = new ();
     public async Task Display()
     {
-        await DisplayOrders();
+        int workOrderPartId = AnsiConsole.Ask<int>("Please enter a part id");
+        await CreateOrder(workOrderPartId);
     }
-    public async Task DisplayOrders()
+    public async Task CreateOrder(int partId)
     {
-        Console.WriteLine("not implemented");
+    // confirm part exists (can be amnufactured)
+    Part ?partProduced = await partController.GetPartV2(partId);
+    if (partProduced == null)
+        {
+            AnsiConsole.MarkupLine("[red]no part with that id was found[/]");
+            return;
+        }
+    if (AnsiConsole.Confirm("Submit?"))
+        {
+            await workOrderController.CreateWorkOrder(partId);
+        }
     }
-    public async Task CreateOrder()
+    public async Task GetPart()
     {
-        throw new NotImplementedException();
+        await partController.GetParts();
     }
 }

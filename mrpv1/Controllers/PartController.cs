@@ -27,10 +27,8 @@ public class PartController()
                 while (await reader.ReadAsync())
                 {
                     int partId = reader.GetInt32(0);
-                    int inventoryId = reader.GetInt32(1);
-                    string partName = reader.GetString(2);
-                    int quantity = reader.GetInt32(3);
-                    Part newPart = new() { Id = partId, InventoryId = inventoryId, Name = partName, Quantity = quantity };
+                    string partName = reader.GetString(1);
+                    Part newPart = new() { Id = partId, Name = partName};
                     parts.Add(newPart);
                 }
             AnsiConsole.MarkupLine($"        -> [green]Done.[/]");
@@ -42,6 +40,55 @@ public class PartController()
             Console.WriteLine(e.Message);
         }
         return parts;
+    }
+    public async Task<Part> GetPartV1(int id)
+    {
+        Part part = new() { Name = "Not found" };
+        try
+        {
+            await using var dataSource = dbBuilder.BuildMultiHost();
+            await using (var cmd = dataSource.CreateCommand($"SELECT * FROM part WHERE id={id};"))
+
+            await using (var reader = await cmd.ExecuteReaderAsync())
+
+                while (await reader.ReadAsync())
+                {
+                    part.Id = reader.GetInt32(0);
+                    part.Name = reader.GetString(1);
+                    // Part part = new() { Id = equipmentId, InventoryId = inventoryId, Name = equipmentName, Quantity = quantity };
+                }
+        }
+        catch (NpgsqlException e)
+        {
+            Console.WriteLine("Failed.");
+            Console.WriteLine(e.Message);
+        }
+        return part;
+    }
+    public async Task<Part?> GetPartV2(int id)
+    {
+        try
+        {
+            await using var dataSource = dbBuilder.BuildMultiHost();
+            await using var command = dataSource.CreateCommand($"SELECT * FROM part WHERE id={id}");
+            await using var reader = await command.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {   if (reader[0] != null)
+                {
+                    Part foundPart = new Part() { 
+                    Id= reader.GetInt32(0),
+                    Name = reader.GetString(0)
+                };
+                return foundPart;
+                }
+            }
+        }
+        catch (NpgsqlException e)
+        {
+            Console.WriteLine(e.Message);
+        }
+        return null;
     }
     public async Task<int> CreatePart(Part part)
     {

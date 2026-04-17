@@ -28,7 +28,6 @@ public class Page()
     }
     private async Task Redirect(PageTitle pageTitle)
     {
-        await ClearDisplay();
         switch (pageTitle)
         {
             case PageTitle.DesignPage:

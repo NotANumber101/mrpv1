@@ -51,31 +51,5 @@ public class ManufacturePage() : Page
             await MainMenu();
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    public void ExamplePrintOperationStack()
-    {
-        Console.WriteLine("WORK CENTER QUEUE");
-        Console.WriteLine("------------------------");
-
-        Console.WriteLine("                                                               WorkOrderId: 100");
-        Console.WriteLine("        PartId: 700 <------op70------ MpartId:1005 <------op40----- PartId: 200");
-        Console.WriteLine("PartInstanceId: 400 <---------------------------------------PartInstanceId: 400");
-
-
-        // TODO: TREE VERSION
-    }
 }
 

@@ -9,7 +9,7 @@ public class PartQueries
     }
         public static string CreatePart(Part newPart)
     {
-        return "INSERT into part (inventoryId, name, quantity) "
-            + $"VALUES ({newPart.InventoryId}, '{newPart.Name}', {newPart.Quantity}) RETURNING id;";
+        return "INSERT into part (name) "
+            + $"VALUES ('{newPart.Name}') RETURNING id;";
     }
 }

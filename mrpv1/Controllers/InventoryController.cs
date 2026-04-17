@@ -78,10 +78,8 @@ public class InventoryController()
                 while (await reader.ReadAsync())
                 {
                     int partId = reader.GetInt32(0);
-                    int inventoryId = reader.GetInt32(1);
-                    string partName = reader.GetString(2);
-                    int quantity = reader.GetInt32(3);
-                    Part newPart = new() { Id = partId, InventoryId = inventoryId, Name = partName, Quantity = quantity };
+                    string partName = reader.GetString(1);
+                    Part newPart = new() { Id = partId, Name = partName };
                     parts.Add(newPart);
                 }
             // AnsiConsole.MarkupLine($"        -> [green]Done.[/]");
@@ -96,7 +94,7 @@ public class InventoryController()
     }
     public async Task<Part> GetPart(int id)
     {
-        Part part = new() { Name = "Not found", InventoryId = id };
+        Part part = new() { Name = "Not found" };
         try
         {
             await using var dataSource = dbBuilder.BuildMultiHost();
@@ -107,9 +105,7 @@ public class InventoryController()
                 while (await reader.ReadAsync())
                 {
                     part.Id = reader.GetInt32(0);
-                    part.InventoryId = reader.GetInt32(1);
-                    part.Name = reader.GetString(2);
-                    part.Quantity = reader.GetInt32(3);
+                    part.Name = reader.GetString(1);
                     // Part part = new() { Id = equipmentId, InventoryId = inventoryId, Name = equipmentName, Quantity = quantity };
                 }
         }

@@ -15,8 +15,9 @@ public class InventoryPage() : Page
     readonly PartController partController = new();
     public async Task Display()
     {
-        await DisplayInventory();
-        await MainMenu();
+        // await DisplayInventory();
+        // await MainMenu();
+        Console.WriteLine("nothing here...");
         // await CreatePart();
     }
     public async Task DisplayInventory()
@@ -61,7 +62,7 @@ public class InventoryPage() : Page
         var inventoryItems = await inventoryController.GetParts();
         foreach (Part inventoryItem in inventoryItems)
         {
-            myTable.AddRow(inventoryItem.Id.ToString(), inventoryItem.InventoryId.ToString(), inventoryItem.Name, inventoryItem.Quantity.ToString());
+            myTable.AddRow(inventoryItem.Id.ToString(), inventoryItem.Name);
         }
         return myTable;
     }
@@ -146,9 +147,7 @@ public class InventoryPage() : Page
 
         Part newPart = new()
         {
-            InventoryId = locationId,
-            Name = partName,
-            Quantity = 0
+            Name = partName
         };
         int partId = await partController.CreatePart(newPart);
 

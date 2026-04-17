@@ -1,7 +1,6 @@
-using mrpv1.Controllers;
-using mrpv1.Helpers;
-using mrpv1.Models;
 using Spectre.Console;
+using mrpv1.Controllers;
+using mrpv1.Models;
 
 namespace mrpv1.Pages;
 
@@ -18,7 +17,6 @@ public class WorkCenterPage() : Page
 
         AnsiConsole.MarkupLine("wc page");
         var res = await workCenterController.GetWorkCenters();
-        // await inventoryController.GetIlocations();
         foreach (var wc in res)
         {
             var tree = new Tree($"{wc.Name} | location:{wc.Location} ")
@@ -44,24 +42,14 @@ public class WorkCenterPage() : Page
                     var opNodePanel = new Panel($"op_execution:{opExecution.Id}\nExecution Log: {opExecution.ExecutionLog}");
                     var opNode = workorderqueuenode.AddNode(opNodePanel);
 
-
                     List<Operation> ops = await operationController.GetOperationById(opExecution.OperationId);
                     var opTemplate = opNode.AddNode($"operation:({ops[0].Id}){ops[0].Instruction}");
                     var opConsumptionNode = opTemplate.AddNode($"consumes: {ops[0].PartConsumed}\nproduces:{ops[0].PartProduced}");
-
                 }
             }
             AnsiConsole.Write(wcPanel);
-
-
-            // AnsiConsole.MarkupLine("--------------------------------------------");
             // await DisplayTree();
         }
-        if (AnsiConsole.Confirm("CREATE TEST WORKORDER?"))
-        {
-            await workOrderController.CreateWorkOrder(111002);
-        }
-
     }
     public async Task DisplayTree()
     {
