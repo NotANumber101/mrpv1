@@ -14,154 +14,164 @@ public class DesignPage() : Page
 {
     PartController partController = new();
     OperationController operationController = new();
+    public async Task ExampleGrid1()
+    {
+        // Create main grid
+        var mainGrid = new Grid { Expand = true };
+        mainGrid.AddColumn();
+
+        // Create header
+        var operationsTable = await DisplayOperationsTable();
+        // var header = new Panel(table)
+        var header = new Panel("[bold yellow]Catalog[/]")
+
+            .BorderColor(Color.Yellow)
+            .RoundedBorder();
+
+        mainGrid.AddRow(header);
+        mainGrid.AddEmptyRow();
+
+        var operationsPanel = new Panel(operationsTable)
+            .Header("Operations")
+            .BorderColor(Color.Green);
+
+        var partsTable = await PartTable();
+        var inventoryPanel = new Panel(partsTable)
+            .Header("Inventory")
+            .BorderColor(Color.Black);
+
+
+        List<Panel> panels = [operationsPanel, inventoryPanel];
+
+        // Create metrics grid
+        var catalogGrid = new Grid();
+        catalogGrid.AddColumns(panels.Count);
+
+
+        catalogGrid.AddRow(operationsPanel, inventoryPanel);
+
+        mainGrid.AddRow(catalogGrid);
+
+        AnsiConsole.Write(mainGrid);
+    }
+
+    public Table InventoryItemTableBuilder(string title)
+    {
+        var myTable = new Table()
+            .Title($"[yellow bold]{title}[/]")
+            .RoundedBorder()
+            .BorderColor(Color.Grey);
+        myTable.AddColumn("Id");
+        myTable.AddColumn("Name");
+        // myTable.AddColumn("Quantity");
+        return myTable;
+    }
+    public async Task<Table> PartTable()
+    {
+        var myTable = InventoryItemTableBuilder("parts");
+        var parts = await partController.GetParts();
+        foreach (Part part in parts)
+        {
+            myTable.AddRow(part.Id.ToString(), part.Name ?? "");
+        }
+        return myTable;
+    }
     public async Task Display()
     {
-        Console.WriteLine("DESIGN PAGE");
-        var designPageOptions = new List<string> { "manage catalog" };
-        var designPageChoice = AnsiConsole.Prompt(
+        await ExampleGrid1();
+        // u should start with part consumed, not produced. then wrok tyour way to a solution (part produced)
+        var pageOptions = new List<string> { "Create Operation", "Create Part" };
+        var pageChoice = AnsiConsole.Prompt(
             new SelectionPrompt<string>()
-                .Title("[green]Select a page to view:[/]")
+                .Title("[green]Welcome,[/]")
                 .PageSize(10)
-                .AddChoices(designPageOptions));
-        // await PageRedirect(pageChoice);
-        if (designPageChoice == "manage catalog")
+                .AddChoices(pageOptions));
+        if (pageChoice == "Create Operation")
         {
-            // display parts m parts to help pick correct id sswhile developing
-
-            // first search for part produced in inventory, if it doesnt exist it must be made
-
-            // 1. ask user for pp
-            // 2. search db for pp name
-            // if no create part return id
-            // if yes return id
-            // 3. ask user, does the operatio
-            // wait a minute...... im doing this backwards.
-
-            // u should start with part consumed, not produced. then wrok tyour way to a solution (part produced)
-            var pageOptions = new List<string> { "Create Operation" };
-            var pageChoice = AnsiConsole.Prompt(
-                new SelectionPrompt<string>()
-                    .Title("[green]Welcome,[/]")
-                    .PageSize(10)
-                    .AddChoices(pageOptions));
-            if (pageChoice == "Create Operation")
-            {
-                await CreateOperation();
-            }
-
-
-            // sooo, 1. ask user for pc
-            // 2. search db for pc
-            // 3. it must exist or be added to db NOW at time of operation creating
-            // 4. user must decide if the operation creates a part or an mpart
-            // 5. if part, no more operations should be added now
-            // 6. if mpart, more operations are requried to be added now
-            // if mpart. does it exist?
-            // user cannot end create operataion without pc
-
-            // Console.WriteLine("Search Parts Feature");
-
-            /// BUILD OPERATION M STACK
-            /// Autocomplete?
-
+            await CreateOperation();
         }
+        else if (pageChoice == "Create Part")
+        {
+            string partName = AnsiConsole.Ask<string>("Please enter a part name");
+            Part newPart = new()
+            {
+                Name = partName
+            };
+            await partController.CreatePart(newPart);
+        }
+    }
+    public async Task<Table> DisplayOperationsTable()
+    {
+        var table = new Table().Title("operations")
+            .AddColumn("Id")
+            .AddColumn("Instructions")
+            .AddColumn("pConsumed")
+            .AddColumn("pProduced");
+        List<Operation> operations = await operationController.GetOperations();
+        foreach (Operation op in operations)
+        {
+            table.AddRow(
+                op.Id.ToString(),
+                op.Instruction ?? "",
+                op.PartConsumed.ToString(),
+                op.PartProduced.ToString());
+        }
+        return table;
     }
     public async Task CreateOperation()
     {
         // todo, a function thats seeds the db with my locations enums
-        if (AnsiConsole.Confirm("Display Inventory?"))
-        {
-            await new InventoryPage().DisplayInventory();
-        }
         AnsiConsole.MarkupLine("to cancel, type: abort");
-        AnsiConsole.MarkupLine("to create part on the fly, type: newpart");
 
         string operationInstruction = AnsiConsole.Ask<string>($"[green]op instructions: [/]");
         if (operationInstruction == "abort")
         {
             await Display();
         }
-        if (operationInstruction == "newpart")
-        {
-            int partId = await new InventoryPage().CreatePart();
-            Console.WriteLine($"New part created: {partId}");
-            await CreateOperation();
-        }
 
         int partProduced = AnsiConsole.Ask<int>($"[green]Inventory Part Produced: [/]");
-        // auto create part, set location to wc
         int partConsumed = AnsiConsole.Ask<int>($"[green]Inventory Part Consumed: [/]");
-        int mPartProduced = AnsiConsole.Ask<int>($"[green]Manufacture Part Produced: [/]");
-        int mPartConsumed = AnsiConsole.Ask<int>($"[green]Manufacture Part Consumed: [/]");
-        int equipment = AnsiConsole.Ask<int>($"[green]equipment: [/]");
-        int material = AnsiConsole.Ask<int>($"[green]material: [/]");
-        int machine = AnsiConsole.Ask<int>($"[green]machine: [/]");
-        int tool = AnsiConsole.Ask<int>($"[green]tool: [/]");
-                /// INSERT OPERATION
-        // Operation newOp = new()
-        // {
-        //     Instruction = operationInstruction,
-        //     PartConsumed = partConsumed,
-        //     PartProduced = partProduced,
-        //     MPartConsumed = mPartConsumed,
-        //     MPartProduced = mPartProduced,
-        //     Material = material,
-        //     Tool = tool,
-        //     Equipment = equipment,
-        //     Machine = machine
-        // };
-        // await operationController.CreateOperation(newOp);
-        
 
-
-
-        if (AnsiConsole.Confirm("Create more operations?"))
+        Operation newOp = new()
         {
-            await CreateOperation();
-        }
-        else
-        {
-            await DisplayOperationsTable();
-        }
+            Instruction = operationInstruction,
+            PartConsumed = partConsumed,
+            PartProduced = partProduced
+        };
+        await operationController.CreateOperation(newOp);
+        AnsiConsole.Clear();
+        await Display();
     }
-    public async Task DisplayOperationsTable()
-    {
-        Console.WriteLine("Operations");
-        var table = new Table().Title("operations")
-            .AddColumn("Id")
-            .AddColumn("Instructions")
-            .AddColumn("pProduced")
-            .AddColumn("pConsumed")
-            .AddColumn("mpProduced")
-            .AddColumn("mpConsumed")
-            .AddColumn("material")
-            .AddColumn("tool")
-            .AddColumn("machine")
-            .AddColumn("equipment");
 
-
-        List<Operation> operations = await operationController.GetOperations();
-        // foreach (Operation op in operations)
-        // {
-        //     table.AddRow(op.Id.ToString(), op.Instruction,
-        //     op.PartConsumed.ToString(),
-        //     op.PartProduced.ToString(),
-        //     op.MPartConsumed.ToString(),
-        //     op.MPartProduced.ToString(),
-        //     op.Material.ToString(), op.Tool.ToString(),
-        //     op.Machine.ToString(), op.Equipment.ToString());
-        // }
-        AnsiConsole.Write(table);
-    }
-    public async Task CreateMockOperations()
-    {
-        Console.WriteLine("Creating mock operations");
-        int i = 0;
-        while (i <= 10)
-        {
-            string instruction = $"test-op-{i}";
-            await new OperationController().CreateOperation(new Operation() { Instruction = instruction });
-            i++;
-        }
-    }
 }
+
+
+
+//  var grid = new Grid();
+
+//         // Configure columns
+//         grid.AddColumn(new GridColumn { Width = 20, Alignment = Justify.Right });
+//         grid.AddColumn(new GridColumn());
+
+//         // Add header
+//         grid.AddRow(
+//             new Text("System Information", new Style(Color.Yellow, decoration: Decoration.Bold)),
+//             new Text(""));
+
+//         grid.AddEmptyRow();
+
+//         // Add data rows
+//         grid.AddRow(new Markup("OS:"), new Markup("[blue]Linux[/]"));
+//         grid.AddRow(new Markup("CPU:"), new Markup("[green]8 cores @ 3.2GHz[/]"));
+//         grid.AddRow(
+//             new Markup("Memory:"),
+//             new BreakdownChart()
+//                 .Width(40)
+//                 .AddItem("Used", 12, Color.Red)
+//                 .AddItem("Available", 4, Color.Green));
+//         grid.AddRow(
+//             new Markup("Disk:"),
+//             new Panel("[yellow]65% used[/]")
+//                 .BorderColor(Color.Yellow));
+
+//         AnsiConsole.Write(grid);
