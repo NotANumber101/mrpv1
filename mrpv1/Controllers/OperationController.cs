@@ -12,6 +12,36 @@ public class OperationController()
     private static readonly string multiHost = "db,localhost";
     readonly NpgsqlDataSourceBuilder dbBuilder = new DbSourceBuilder(multiHost).Builder();
 
+
+    public async Task<List<Operation>> GetOperationById(int id)
+    {
+        List<Operation> res = [];
+        try
+        {
+            await using var dataSource = dbBuilder.BuildMultiHost();
+            await using (var cmd = dataSource.CreateCommand($"SELECT * FROM operation WHERE id={id};"))
+
+            await using (var reader = await cmd.ExecuteReaderAsync())
+
+                while (await reader.ReadAsync())
+                {
+                    Operation foundOp = new Operation()
+                    {
+                        Id=reader.GetInt32(0),
+                        Instruction=reader.GetString(1),
+                        PartProduced=reader.GetInt32(2),
+                        PartConsumed=reader.GetInt32(3)
+                    };
+                    res.Add(foundOp);
+                }
+        }
+        catch (NpgsqlException e)
+        {
+            Console.WriteLine("Failed.");
+            Console.WriteLine(e.Message);
+        }
+        return res;
+    }
     public async Task<List<Operation>> GetOperations()
     {
         AnsiConsole.MarkupLine("[gray]Fetching[/]");

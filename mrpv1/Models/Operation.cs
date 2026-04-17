@@ -5,7 +5,7 @@ public class Operation()
     public int Id { get; set; }
     public string? Instruction { get; set; }
     public int PartProduced { get; set; }
-    // public int PartConsumed { get; set; }
+    public int PartConsumed { get; set; }
     // public int MPartProduced { get; set; }
     // public int MPartConsumed { get; set; }
     // public int Material { get; set; }

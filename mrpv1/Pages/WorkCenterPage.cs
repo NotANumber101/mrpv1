@@ -21,53 +21,46 @@ public class WorkCenterPage() : Page
         // await inventoryController.GetIlocations();
         foreach (var wc in res)
         {
-
-            var tree = new Tree("Work center queue");
-            AnsiConsole.MarkupLine("--------------------------------------------");
-            // AnsiConsole.MarkupLine($"[blue]wc found! {wc.Id}[/]");
+            var tree = new Tree($"{wc.Name} | location:{wc.Location} ")
+                .Guide(TreeGuide.BoldLine)
+                .Style(Style.Parse("dim"));
+            var wcPanel = new Panel(tree).BorderColor(Color.Green);
             int wcqid = await workCenterController.GetWorkCenterQueue(wc.Id);
-            var wcNode = tree.AddNode($"[red]{wc.Name}(location:{wc.Location}[/]");
-
-      
-            // AnsiConsole.MarkupLine($"----> {wc.Name}");
-            // AnsiConsole.MarkupLine($"    ------> {wc.Location}");
-            // AnsiConsole.MarkupLine($"    ------> work center queue id: {wcqid}");
+            var wcNodePanel = new Panel($"[red]work center queue id: {wcqid}[/]");
+            var wcNode = tree.AddNode(wcNodePanel);
 
             List<WorkOrderQueue> workOrderQueues = await workOrderController.GetWorkOrderQueues(wcqid);
             if (workOrderQueues.Count < 1)
             {
-                // AnsiConsole.MarkupLine($"         ------> work center not assigned any work orders");
                 wcNode.AddNode("no work orders");
-                // add mock work order
-
             }
             foreach (WorkOrderQueue workOrderQueue in workOrderQueues)
             {
-                var workorderqueuenode = wcNode.AddNode(workOrderQueue.Id.ToString());
-                // AnsiConsole.MarkupLine($"         ------> work ORDER queue:{workOrderQueue.Id}");
-                // AnsiConsole.MarkupLine($"               ------> workcenterqueue id {workOrderQueue.WorkCenterQueueId}");
-                // AnsiConsole.MarkupLine($"               ------> part produced serial {workOrderQueue.PartProducedSerialNumber}");
+                var workorderqueuenodePanel = new Panel("WorkOrderQueue: " + workOrderQueue.Id.ToString());
+                var workorderqueuenode = wcNode.AddNode(workorderqueuenodePanel);
                 List<OpExecution> opExecutions = await operationController.GetWorkOrderOpExecutions(workOrderQueue.Id);
-                foreach (OpExecution op in opExecutions)
+                foreach (OpExecution opExecution in opExecutions)
                 {
-                    var opNode = workorderqueuenode.AddNode($"opEx for operation:{op.OperationId}");
+                    var opNodePanel = new Panel($"op_execution:{opExecution.Id}\nExecution Log: {opExecution.ExecutionLog}");
+                    var opNode = workorderqueuenode.AddNode(opNodePanel);
 
-                    // AnsiConsole.MarkupLine($"        ---------------> woq({workOrderQueue.Id})opExecutionId: {op.Id}, op template: {op.OperationId}");
-                    // AnsiConsole.MarkupLine($"        ---------------------> ");
-                    // get op template
+
+                    List<Operation> ops = await operationController.GetOperationById(opExecution.OperationId);
+                    var opTemplate = opNode.AddNode($"operation:({ops[0].Id}){ops[0].Instruction}");
+                    var opConsumptionNode = opTemplate.AddNode($"consumes: {ops[0].PartConsumed}\nproduces:{ops[0].PartProduced}");
 
                 }
             }
-            AnsiConsole.Write(tree);
+            AnsiConsole.Write(wcPanel);
 
 
             // AnsiConsole.MarkupLine("--------------------------------------------");
             // await DisplayTree();
         }
-                    if (AnsiConsole.Confirm("CREATE TEST WORKORDER?"))
-            {
-                await workOrderController.CreateWorkOrder(111002);
-            }
+        if (AnsiConsole.Confirm("CREATE TEST WORKORDER?"))
+        {
+            await workOrderController.CreateWorkOrder(111002);
+        }
 
     }
     public async Task DisplayTree()
