@@ -148,7 +148,8 @@ public class OperationController()
                             Id = reader.GetInt32(0),
                             OperationId = reader.GetInt32(1),
                             WorkOrderQueueId = reader.GetInt32(2),
-                            ExecutionLog = reader.GetString(3)
+                            ExecutionLog = reader.GetString(3),
+                            TimeStart = reader.GetDateTime(4)
                         };
                         opExecutions.Add(opExecution);
                     }

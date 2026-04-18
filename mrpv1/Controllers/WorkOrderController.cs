@@ -46,7 +46,9 @@ public class WorkOrderController()
     {
         AnsiConsole.WriteLine($"[red]MOCK SCENARIO -- CREATING WORK ORDER -- [/]");
         int wc6QueueId = 86;
+        // int wcQueueId = 86;
 
+        // TODO: turn this into a cool tree print out
         try
         {
             await using var dataSource = dbBuilder.Build();
@@ -64,14 +66,15 @@ public class WorkOrderController()
             AnsiConsole.MarkupLine($"[red]Createing new workorder...[/]");
             await using var createWorkOrderCommand = new NpgsqlCommand($"INSERT into work_order (partProduced) VALUES ({partProducedId}) RETURNING id;", connection, transaction);
             int workOrderId = (int)createWorkOrderCommand.ExecuteScalar()!;
-            AnsiConsole.MarkupLine($"[blue]Work Order: {workOrderId} created[/]");
+            AnsiConsole.MarkupLine($"[blue]Work Order: {workOrderId} created\n[/]");
 
 
             // create new part instance
             AnsiConsole.MarkupLine($"[red]Createing new part instance...[/]");
             await using var createPartInstance = new NpgsqlCommand($"INSERT into part_instance (partId) VALUES ({partProducedId}) RETURNING id;", connection, transaction);
             int newSerialNumber = (int)createPartInstance.ExecuteScalar()!;
-            AnsiConsole.MarkupLine($"[red]Part Instance: {newSerialNumber} success: created using part produced id = {partProducedId}[/]");
+            AnsiConsole.MarkupLine($"[red]part_instance row created for s/n: {newSerialNumber}\n --->created using part produced id = {partProducedId}[/]");
+
 
 
             AnsiConsole.MarkupLine($"[red]Determining the best operations and wcs...[/]");
@@ -100,6 +103,14 @@ public class WorkOrderController()
             }
             AnsiConsole.MarkupLine($"[red]Work Center Success: wc required: 99006[/]");
             
+
+
+
+//////////////////////////////////////
+/// 
+/// 
+
+
             AnsiConsole.MarkupLine($"[red]Createing new work order queue...[/]");
             await using var createWorkOrderQueueCommand = new NpgsqlCommand(
                 $"INSERT into work_order_queue (partProducedSerialNumber, workCenterQueueId) " +
@@ -107,6 +118,10 @@ public class WorkOrderController()
             int workOrderQueueId = (int)createWorkOrderQueueCommand.ExecuteScalar()!;
             AnsiConsole.MarkupLine($"[blue]Work Order Queue{workOrderQueueId} created using work center queue id = {wc6QueueId}[/]");
 
+
+
+
+///////////////////////////////////////////////////
 
             // create op executions to attach to work order queue
             // attach work order queue to qworkcenter queue

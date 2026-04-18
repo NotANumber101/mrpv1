@@ -17,12 +17,12 @@ public class OrderPage() : Page
     public async Task CreateOrder(int partId)
     {
     // confirm part exists (can be amnufactured)
-    Part ?partProduced = await partController.GetPartV2(partId);
-    if (partProduced == null)
-        {
-            AnsiConsole.MarkupLine("[red]no part with that id was found[/]");
-            return;
-        }
+    // Part ?partProduced = await partController.GetPartV2(partId);
+    // if (partProduced == null)
+    //     {
+    //         AnsiConsole.MarkupLine("[red]no part with that id was found[/]");
+    //         return;
+    //     }
     if (AnsiConsole.Confirm("Submit?"))
         {
             await workOrderController.CreateWorkOrder(partId);
