@@ -24,11 +24,11 @@ public class InventoryPage() : Page
         myTable.AddColumn("Id");
         myTable.AddColumn("Name");
         myTable.AddColumn("Description");
-        var inventories = await inventoryController.GetInventories();
-        foreach (Inventory inventory in inventories)
-        {
-            myTable.AddRow(inventory.Id.ToString(), inventory.Location, inventory.Description);
-        }
+        // var inventories = await inventoryController.GetInventories();
+        // foreach (Inventory inventory in inventories)
+        // {
+        //     myTable.AddRow(inventory.Id.ToString(), inventory.Location, inventory.Description);
+        // }
         return myTable;
     }
     public async Task<int> CreatePart()
