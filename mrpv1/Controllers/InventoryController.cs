@@ -26,7 +26,6 @@ public class InventoryController()
                 {
 
                     var enumValue = reader.GetFieldValue<string>(0);
-                    Console.WriteLine($"--ENUM VALLLLLUUUEEE: {enumValue}");
                 }
         }
         catch (NpgsqlException e)
@@ -35,16 +34,6 @@ public class InventoryController()
             Console.WriteLine(e.Message);
         }
         // return parts;
-
-
-
-
-
-
-
-
-
-
 
         // // List<Inventory.Locations> iLocations = [];
         // // Reading
@@ -65,8 +54,6 @@ public class InventoryController()
     }
     public async Task<List<Part>> GetParts()
     {
-        // AnsiConsole.MarkupLine("[gray]Fetching[/]");
-        // AnsiConsole.MarkupLine("    -> [gray]Get Parts..[/]");
         List<Part> parts = [];
         try
         {
@@ -82,12 +69,10 @@ public class InventoryController()
                     Part newPart = new() { Id = partId, Name = partName };
                     parts.Add(newPart);
                 }
-            // AnsiConsole.MarkupLine($"        -> [green]Done.[/]");
             return parts;
         }
         catch (NpgsqlException e)
         {
-            Console.WriteLine("Failed.");
             Console.WriteLine(e.Message);
         }
         return parts;
@@ -115,165 +100,6 @@ public class InventoryController()
             Console.WriteLine(e.Message);
         }
         return part;
-    }
-    public async Task<List<Equipment>> GetEquipments()
-    {
-        // AnsiConsole.MarkupLine("[gray]Fetching[/]");
-        // AnsiConsole.MarkupLine("    -> [gray]Get Equipments..[/]");
-        List<Equipment> equipments = [];
-        try
-        {
-            await using var dataSource = dbBuilder.BuildMultiHost();
-            await using (var getPartsCommand = dataSource.CreateCommand("SELECT * FROM equipment;"))
-
-            await using (var reader = await getPartsCommand.ExecuteReaderAsync())
-
-                while (await reader.ReadAsync())
-                {
-                    int equipmentId = reader.GetInt32(0);
-                    int inventoryId = reader.GetInt32(1);
-                    string equipmentName = reader.GetString(2);
-                    int quantity = reader.GetInt32(3);
-                    Equipment equipment = new() { Id = equipmentId, InventoryId = inventoryId, Name = equipmentName, Quantity = quantity };
-                    equipments.Add(equipment);
-                }
-            AnsiConsole.MarkupLine($"        -> [green]Done.[/]");
-            return equipments;
-        }
-        catch (NpgsqlException e)
-        {
-            Console.WriteLine("Failed.");
-            Console.WriteLine(e.Message);
-        }
-        return equipments;
-    }
-    public async Task<List<Material>> GetMaterials()
-    {
-        // AnsiConsole.MarkupLine("[gray]Fetching[/]");
-        // AnsiConsole.MarkupLine("    -> [gray]Get Materials..[/]");
-        List<Material> materials = [];
-        try
-        {
-            await using var dataSource = dbBuilder.BuildMultiHost();
-            await using (var getMaterialsCommand = dataSource.CreateCommand("SELECT * FROM material;"))
-
-            await using (var reader = await getMaterialsCommand.ExecuteReaderAsync())
-
-                while (await reader.ReadAsync())
-                {
-                    int materialId = reader.GetInt32(0);
-                    int inventoryId = reader.GetInt32(1);
-                    string materialName = reader.GetString(2);
-                    int quantity = reader.GetInt32(3);
-                    Material newMaterial = new() { Id = materialId, InventoryId = inventoryId, Name = materialName, Quantity = quantity };
-                    materials.Add(newMaterial);
-                }
-            // AnsiConsole.MarkupLine($"        -> [green]Done.[/]");
-            return materials;
-        }
-        catch (NpgsqlException e)
-        {
-            Console.WriteLine("Failed.");
-            Console.WriteLine(e.Message);
-        }
-        return materials;
-    }
-    public async Task<List<Tool>> GetTools()
-    {
-        // AnsiConsole.MarkupLine("[gray]Fetching[/]");
-        // AnsiConsole.MarkupLine("    -> [gray]Get Tools..[/]");
-        List<Tool> tools = [];
-        try
-        {
-            await using var dataSource = dbBuilder.BuildMultiHost();
-            await using (var getToolsCommand = dataSource.CreateCommand("SELECT * FROM tool;"))
-
-            await using (var reader = await getToolsCommand.ExecuteReaderAsync())
-
-                while (await reader.ReadAsync())
-                {
-                    int toolId = reader.GetInt32(0);
-                    int inventoryId = reader.GetInt32(1);
-                    string toolName = reader.GetString(2);
-                    int quantity = reader.GetInt32(3);
-                    Tool newTool = new() { Id = toolId, InventoryId = inventoryId, Name = toolName, Quantity = quantity };
-                    tools.Add(newTool);
-                }
-            // AnsiConsole.MarkupLine($"        -> [green]Done.[/]");
-            return tools;
-        }
-        catch (NpgsqlException e)
-        {
-            Console.WriteLine("Failed.");
-            Console.WriteLine(e.Message);
-        }
-        return tools;
-    }
-    public async Task<List<Inventory>> GetInventories()
-    {
-        // AnsiConsole.MarkupLine("[gray]Fetching[/]");
-        // AnsiConsole.MarkupLine("    -> [gray]Get Inventories..[/]");
-        List<Inventory> inventories = [];
-        try
-        {
-            await using var dataSource = dbBuilder.BuildMultiHost();
-            await using (var getInventoriesCommand = dataSource.CreateCommand("SELECT * FROM inventory;"))
-
-            await using (var reader = await getInventoriesCommand.ExecuteReaderAsync())
-
-                while (await reader.ReadAsync())
-                {
-                    int inventoryId = reader.GetInt32(0);
-                    string inventoryLocation = reader.GetString(2);
-                    string inventoryDescription = reader.GetString(2);
-                    Inventory inventory = new() { Id = inventoryId, Location = inventoryLocation, Description = inventoryDescription };
-                    inventories.Add(inventory);
-                }
-            // AnsiConsole.MarkupLine($"        -> [green]Done.[/]");
-            return inventories;
-        }
-        catch (NpgsqlException e)
-        {
-            Console.WriteLine("Failed.");
-            Console.WriteLine(e.Message);
-        }
-        return inventories;
-    }
-
-
-
-
-
-    public async Task<List<Machine>> GetMachines()
-    {
-        // AnsiConsole.MarkupLine("[gray]Fetching[/]");
-        // AnsiConsole.MarkupLine("    -> [gray]GetMachine..[/]");
-        List<Machine> machines = [];
-        try
-        {
-            await using var dataSource = dbBuilder.BuildMultiHost();
-            await using (var getMachineCommand = dataSource.CreateCommand("SELECT * FROM machine;"))
-
-            await using (var reader = await getMachineCommand.ExecuteReaderAsync())
-
-                while (await reader.ReadAsync())
-                {
-                    int machineId = reader.GetInt32(0);
-                    int inventoryId = reader.GetInt32(1);
-                    string machineName = reader.GetString(2);
-                    int quantity = reader.GetInt32(3);
-                    Machine newMachine = new() { Id = machineId, InventoryId = inventoryId, Name = machineName, Quantity = quantity };
-                    machines.Add(newMachine);
-                }
-            // AnsiConsole.MarkupLine($"        -> [green]Done.[/]");
-            return machines;
-        }
-        catch (NpgsqlException e)
-        {
-            Console.WriteLine("Failed.");
-            Console.WriteLine(e.Message);
-        }
-        return machines;
     }
     public async Task CreatePart(Part part)
     {

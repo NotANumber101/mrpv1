@@ -103,7 +103,6 @@ public class PartController()
         }
         catch (NpgsqlException e)
         {
-            Console.WriteLine("Failed.");
             Console.WriteLine(e.Message);
         }
         return newPartId;
