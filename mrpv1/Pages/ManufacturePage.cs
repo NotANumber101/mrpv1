@@ -12,43 +12,35 @@ namespace mrpv1.Pages;
 public class ManufacturePage() : Page
 
 {
-    readonly InventoryController inventoryController = new();
-    readonly OperationController operationController = new();
+    readonly WorkCenterController workCenterController = new();
     public async Task Display()
     {
-        Console.WriteLine("MANUFACTURE PAGE");
-        await new WorkCenterPage().Display();
-        // await DisplayOperations();
+        await DisplayWorkCenters();
     }
-    public async Task DisplayOperations()
+    public async Task DisplayWorkCenters()
     {
-        Console.WriteLine("Operations");
+        Dictionary<string, WorkCenter> workCenterDict = [];
 
-        List<Operation> operations = await operationController.GetOperations();
-        foreach (Operation op in operations)
+        var workCenters = await workCenterController.GetWorkCenters();
+
+        List<string> wcButtons = [];
+        foreach (var wc in workCenters)
         {
-            await DisplayOperationPanel(op);
+            wcButtons.Add(wc.Name);
+            workCenterDict[wc.Name] = wc;
         }
-    }
-    public async Task DisplayOperationPanel(Operation operation)
-    {
-        // Part partConsumed = await inventoryController.GetPart(operation.PartConsumed);
-        Part partProduced = await inventoryController.GetPart(operation.PartProduced);
-        Console.WriteLine("Operation Details");
-        // AnsiConsole.Write(new Panel($"{operation.Instruction}, produces: {partProduced.Name}({partProduced.Id})\nconsumes: {partConsumed.Name}({partConsumed.Id})"));
-    }
-    public async Task CreateOperation()
-    {
-        string opInstructionInput = AnsiConsole.Ask<string>($"[green]Instructions:[/]");
+        string pageChoice = AnsiConsole.Prompt(
+            new SelectionPrompt<string>()
+                .Title("[green]Main Menu[/]")
+                .PageSize(10)
+                .AddChoices(wcButtons));
 
-        Operation newOp = new()
+        await new WorkCenterPage().Display(workCenterDict[pageChoice]);
+
+        if (AnsiConsole.Confirm("Return to work centers?"))
         {
-            Instruction = opInstructionInput
-        };
-        await operationController.CreateOperation(newOp);
-        if (AnsiConsole.Confirm("Return?"))
-        {
-            await MainMenu();
+            AnsiConsole.Clear();
+            await Display();
         }
     }
 }

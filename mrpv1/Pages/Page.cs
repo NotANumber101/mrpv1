@@ -3,6 +3,7 @@ using Spectre.Console;
 
 namespace mrpv1.Pages;
 
+
 public class Page()
 {
     enum PageTitle
