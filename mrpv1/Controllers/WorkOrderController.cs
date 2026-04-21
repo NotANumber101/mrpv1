@@ -45,7 +45,7 @@ public class WorkOrderController()
     public async Task CreateWorkOrder(int partProducedId)
     {
         AnsiConsole.WriteLine($"[red]MOCK SCENARIO -- CREATING WORK ORDER -- [/]");
-        int wc6QueueId = 86;
+        int wcWorkBench3Id = 6;
         // int wcQueueId = 86;
 
         // TODO: turn this into a cool tree print out
@@ -57,12 +57,9 @@ public class WorkOrderController()
             //for now, manual input wc. In the future this will be part of the buisness logic.
             // for example. wcs  will have machines and equipment that are required by ops
 
-            // work_center (id, location, name) VALUES (99006, 'cabinet a', 'wc6: inoc chamber');
-            // work_center_queue (id, workCenterId) VALUES (86, 99006);
 
-            // WorkCenter inocChamber = new() { Id = 99006, Location = "cabinet a", Name = "wc6: inoc chamber" };
-            // int inocChamberWcQueueId = 86;
-            // pp 111002
+
+
             AnsiConsole.MarkupLine($"[red]Createing new workorder...[/]");
             await using var createWorkOrderCommand = new NpgsqlCommand($"INSERT into work_order (partProduced) VALUES ({partProducedId}) RETURNING id;", connection, transaction);
             int workOrderId = (int)createWorkOrderCommand.ExecuteScalar()!;
@@ -79,7 +76,6 @@ public class WorkOrderController()
 
             AnsiConsole.MarkupLine($"[red]Determining the best operations and wcs...[/]");
             // find operations to put into a work order queue
-            // Mock = operation (id, instruction, partProduced, partConsumed) VALUES (55750, 'incubate', 111002, 111001);
             // List<Operation> requiredOps = [];
             List<int> opids = [];
 
@@ -92,7 +88,8 @@ public class WorkOrderController()
                     {
                         Id = reader.GetInt32(0),
                         Instruction = reader.GetString(1),
-                        PartProduced = reader.GetInt32(2)
+                        PartProduced = reader.GetInt32(2),
+                        PartConsumed = reader.GetInt32(3)
                     };
                     Console.WriteLine($"----------pp op id-----------{ppOperation.Id}");
                     opids.Add(ppOperation.Id);
@@ -101,7 +98,7 @@ public class WorkOrderController()
             {
                 AnsiConsole.MarkupLine($"[red]Operation Success: found op(s) required: op Id={id}[/]");
             }
-            AnsiConsole.MarkupLine($"[red]Work Center Success: wc required: 99006[/]");
+            // AnsiConsole.MarkupLine($"[red]Work Center Success: wc required: 99006[/]");
             
 
 
@@ -114,9 +111,9 @@ public class WorkOrderController()
             AnsiConsole.MarkupLine($"[red]Createing new work order queue...[/]");
             await using var createWorkOrderQueueCommand = new NpgsqlCommand(
                 $"INSERT into work_order_queue (partProducedSerialNumber, workCenterQueueId) " +
-                $"VALUES ({newSerialNumber}, {wc6QueueId}) RETURNING id;", connection, transaction);
+                $"VALUES ({newSerialNumber}, {wcWorkBench3Id}) RETURNING id;", connection, transaction);
             int workOrderQueueId = (int)createWorkOrderQueueCommand.ExecuteScalar()!;
-            AnsiConsole.MarkupLine($"[blue]Work Order Queue{workOrderQueueId} created using work center queue id = {wc6QueueId}[/]");
+            AnsiConsole.MarkupLine($"[blue]Work Order Queue{workOrderQueueId} created using work center queue id = {wcWorkBench3Id}[/]");
 
 
 
@@ -125,8 +122,8 @@ public class WorkOrderController()
 
             // create op executions to attach to work order queue
             // attach work order queue to qworkcenter queue
-            await using var cmd2 = new NpgsqlCommand($"INSERT into op_execution (operationId, workOrderQueueId, executionLog) "
-            + $"VALUES (55750, {workOrderQueueId}, 'test log') RETURNING id;", connection, transaction);
+            await using var cmd2 = new NpgsqlCommand($"INSERT into op_execution (operationId, workOrderQueueId, executionLog, startTime, stopTime, status) "
+            + $"VALUES (55750, {workOrderQueueId}, 'test log', '3-3-2026', '6-5-2026', 'active') RETURNING id;", connection, transaction);
             int opexid = (int)cmd2.ExecuteScalar()!;
             AnsiConsole.MarkupLine($"[red]op ex success: opexid{opexid}[/]");
 
